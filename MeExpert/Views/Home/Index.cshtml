@@ -1,0 +1,379 @@
+﻿@using System.Configuration﻿
+@{
+    var azure_ad_url = ConfigurationManager.AppSettings["azure_ad_url"];
+}
+<link href="~/Content/Chart.css" rel="stylesheet" />
+<script src="~/Scripts/Chart.js"></script>
+<script src="~/Scripts/chartjs-plugin-datalabels.js"></script>
+<style>
+    .form-control {
+        color: grey;
+        font-weight: 700;
+    }
+</style>
+@*<div class="col-12">
+        <div style="width:10%;float:right;color:gray" class="row">
+            <div class="form-group">
+                <label style="margin-top: 9%;"><i class="fas fa-calendar-alt"></i> Year &nbsp;&nbsp;</label>
+            </div>
+            <div class="form-group">
+                <select class="form-control">
+                    <option>2020</option>
+                </select>
+            </div>
+        </div>
+    </div>*@
+<div class="col-lg-4 col-6">
+    <!-- small box -->
+    <div class="small-box bg-gd-blue">
+        <div class="inner">
+            <h4 class="req"></h4>
+
+            <h6>Requisition</h6>
+        </div>
+        <div class="icon">
+            <i class="fas fa-file-signature"></i>
+        </div>
+        <a href="@Url.Action("Index","Requisition")" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+<div class="col-lg-4 col-6">
+    <!-- small box -->
+    <div class="small-box bg-gd-pink">
+        <div class="inner">
+            <h4 class="cand"></h4>
+
+            <h6>Candidate (Pass)</h6>
+        </div>
+        <div class="icon">
+            <i class="fas fa-user-tie"></i>
+        </div>
+        <a href="@Url.Action("Index","Candidate")" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+<div class="col-lg-4 col-6">
+    <!-- small box -->
+    <div class="small-box bg-gd-orange">
+        <div class="inner">
+            <h4 class="clent"></h4>
+            <h6>Client</h6>
+        </div>
+        <div class="icon">
+            <i class="fas fa-igloo"></i>
+        </div>
+        <a href="@Url.Action("Index","Client")" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+</div>
+
+<div class="col-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Requisition Status</h3>
+        </div>
+        <div class="card-body">
+            <canvas id="pieChart"></canvas>
+        </div>
+    </div>
+</div>
+<div class="col-6">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Latest duration of requisition progress</h3>
+        </div>
+        <div class="card-body">
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+         $(document).ajaxStart(function () {
+            $("#loader").css("display", "block");
+        });
+        $(document).ajaxComplete(function () {
+            $("#loader").css("display", "none");
+        });
+        var close = 0;
+        var open = 0;
+        var bar_label_arr = [];
+        var bar_data_arr = [];
+        var url = new URL(window.location.href);
+        var params = new URLSearchParams(url.search);
+        var token = params.get('token');
+        var username = params.get('username');
+
+        if (token != null) {
+            localStorage.setItem('token', token);
+            localStorage.setItem('username', username);
+            lStorage.setItem('azure_ad_url', '@azure_ad_url');
+           
+        GetDB();
+        GetPieVal();
+        GetBarVal();
+        function GetBar() {
+            var ctx = document.getElementById('barChart').getContext('2d');
+            var gd_blue = ctx.createLinearGradient(600,0, 0, 0);
+            gd_blue.addColorStop(1, '#0c28c0');
+            gd_blue.addColorStop(0, '#a0abe7');
+           
+
+            var myBarChart = new Chart(ctx, {
+                type: 'horizontalBar',
+                data: {
+                    labels: bar_label_arr,
+                    datasets: [{
+                        label: false,
+                        data: bar_data_arr,
+                        backgroundColor: [gd_blue, gd_blue, gd_blue, gd_blue],
+                    }]
+                },
+                plugins: [ChartDataLabels],
+                options: {
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                //min: 10,
+                                stepSize: 10
+                            },
+                            gridLines: {
+                                display: false
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Days'
+                            }, offset: true,
+                        }],
+                        yAxes: [{
+                            stacked: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Req No.'
+                            },
+                            gridLines: {
+                                display: false
+                            },
+                        }]
+                    },
+                    legend: {
+                        display: false
+                    },
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: 0
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            display: true,
+                            color: 'gray',
+                            labels: {
+                                title: {
+                                    font: {
+                                        weight: 'bold',
+                                        size: 16,
+                                    }
+                                },
+                            },
+                            formatter: function (value, ctx) {
+                                return value;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+        function GetPie(close,open) {
+
+            var ctx = document.getElementById('pieChart').getContext('2d');
+            Chart.defaults.global.defaultFontSize = 16
+            Chart.Legend.prototype.afterFit = function () {
+                this.height = this.height + 50;
+            };
+            var gd_green = ctx.createLinearGradient(0, 0, 0, 350);
+            gd_green.addColorStop(0, '#11A578');
+            gd_green.addColorStop(1, '#32EAB2');
+            var gd_orange = ctx.createLinearGradient(600, 0, 0, 0);
+            gd_orange.addColorStop(0, '#FFCAB0');
+            gd_orange.addColorStop(1, '#FF864A');
+
+            window.pie = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Open', 'Close'],
+                    datasets: [{
+                        label: '# of Votes',
+                        data: [open, close],
+                        backgroundColor: [gd_green, gd_orange],
+                        //borderColor: 'white',
+                        //borderWidth: 1
+                    }]
+                },
+                plugins: [ChartDataLabels],
+                options: {
+                    scales: {
+                        yAxes: [{
+                            gridLines: {
+                                display: false,
+                                drawBorder: false,
+                            },
+                            ticks: {
+                                display: false
+                            }
+                        }]
+                    },
+                    legend: {
+                        labels: {
+                            fontColor: 'gray',
+                            fontSize: 16
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: 0
+                        }
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            display: true,
+                            color: 'gray',
+                            labels: {
+                                title: {
+                                    font: {
+                                        weight: 'bold',
+                                        size: 16,
+                                    }
+                                },
+                            },
+                            formatter: function (value, ctx) {
+                                return ctx.chart.data.labels[ctx.dataIndex] + ' : ' + value;
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function GetDB() {
+            $.ajax({
+                url: '@Url.Action("Get", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                success: function (Data) {
+                    $('.req').html("");
+                    $('.cand').html("");
+                    $('.clent').html("");
+                    for (var i = 0; i < Data.length; i++) {
+                        if (Data[i].name == "requisition") {
+                            $('.req').append(Data[i].number);
+                        }
+                        else if (Data[i].name == "candidate") {
+                            $('.cand').append(Data[i].number);
+                        }
+                        else if (Data[i].name == "client") {
+                            $('.clent').append(Data[i].number);
+                        }
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function GetPieVal() {
+            $.ajax({
+                url: '@Url.Action("GetPieChart", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                success: function (Data) {
+                    for (var i = 0; i < Data.length; i++) {
+                        if (Data[i].name.toLowerCase() == "close") {
+                            close = Data[i].number;
+                        }
+                        if (Data[i].name.toLowerCase() == "open") {
+                            open = Data[i].number;
+                        }
+                    }
+
+                    GetPie(close, open);
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+         function GetBarVal() {
+            $.ajax({
+                url: '@Url.Action("GetBarChart", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                success: function (Data) {
+                    bar_name_arr = [];
+                    bar_data_arr = [];
+                    for (var i = 0; i < Data.length; i++) {
+                        bar_label_arr.push(Data[i].req_no);
+                        var days = 0;
+                        if (Data[i].s_date != "" && Data[i].e_date != "") {
+                            var n = calDateDel(Data[i].s_date, Data[i].e_date);
+                            days = parseInt(n)+1;
+                        }
+                        bar_data_arr.push(days);
+                    }
+                    GetBar();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        //------------------------cal-date----------------------------//
+        function calDateDel(s_date, f_date) {
+            var f = s_date;
+            var r = f_date;
+            var fdate = f.split("/").reverse().join(",");
+            var rdate = r.split("/").reverse().join(",");
+            if (navigator.userAgent.indexOf('MSIE') !== -1
+                || navigator.appVersion.indexOf('Trident/') > -1) {
+                fdate = f + "T00:00:00.000Z";
+                rdate = r + "T00:00:00.000Z";
+            }
+            f = new Date(fdate);
+            r = new Date(rdate);
+
+            if (f <= r && f != "" && r != "") {
+                var totalDays = Math.round((r - f) / 8.64e7);
+                var wholeWeeks = totalDays / 7 | 0;
+                var days = wholeWeeks * 5;
+                if (totalDays % 7) {
+                    f.setDate(f.getDate() + wholeWeeks * 7);
+
+                    while (f < r) {
+                        f.setDate(f.getDate() + 1);
+                        if (f.getDay() != 0 && f.getDay() != 6) {
+                            ++days;
+                        }
+                    }
+                }
+                return days;
+            }
+
+            }
+        } else {
+             window.location.replace('@azure_ad_url' + 'signin/' + encodeURIComponent(url.href));
+        }
+    });
+</script>

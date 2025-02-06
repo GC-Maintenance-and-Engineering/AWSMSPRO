@@ -1,0 +1,15 @@
+﻿
+@{
+    ViewBag.Title = "Proposal Detail";
+}
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h6>@ViewBag.FileName</h6>
+        </div>
+        <div class="card-body text-center">
+            <embed src="~/Uploads/Proposal/@ViewBag.FileName@Html.Raw(".pdf")" width="800px" height="450px" />
+        </div>
+    </div>
+</div>
+

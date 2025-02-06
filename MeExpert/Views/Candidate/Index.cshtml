@@ -1,0 +1,442 @@
+﻿
+@{
+    ViewBag.Title = "Selected Candidate";
+}
+
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <p ></p>
+        </div>
+        <div class="card-body">
+            <table id="tb-list-page" class="table table-sm table-striped table-bordered" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Name</th>
+                        <th>Requisition No.</th>
+                        <th style="width:111px">Proposal</th>
+                        <th>Position</th>
+                        <th>Start Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody class="tb-list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="detailModal">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 835px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title cand-name"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="card card-primary card-outline card-outline-tabs">
+                    <div class="card-header p-0 border-bottom-0">
+                        <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="custom-tabs-three-home-tab" data-toggle="pill" href="#custom-tabs-three-home" role="tab" aria-controls="custom-tabs-three-home" aria-selected="true">Requisition</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="custom-tabs-three-profile-tab" data-toggle="pill" href="#custom-tabs-three-profile" role="tab" aria-controls="custom-tabs-three-profile" aria-selected="false">Comment</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="custom-tabs-three-tabContent">
+                            <div class="tab-pane fade active show" id="custom-tabs-three-home" role="tabpanel" aria-labelledby="custom-tabs-three-home-tab">
+                                <div class="card-body" style="font-size: 13px;">
+                                    <form class="formValidate" id="formValidate" method="get">
+                                        <div class="req-list" id="accordion">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer">
+                                    <button class="btn btn-info" id="btn-download"><i class="fas fa-file-download"></i> Download Proposal</button>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="custom-tabs-three-profile" role="tabpanel" aria-labelledby="custom-tabs-three-profile-tab">
+                                <div class="card-body" >
+                                    <div class="row">
+                                        <div class="col-9">
+                                            <div class="form-group">
+                                                <textarea class="form-control form-control-sm comm"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="col-2">
+                                            <button class="btn btn-success" id="btn-save-comm">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="ppsModal" style="z-index: 9999;">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 835px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title pps-file-name"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <embed class="file_name" width="800px" height="400px" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="confirmDelModal" style="z-index: 9999;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <span><i class="fas fa-exclamation-circle text-warning" style="font-size:60px;"></i></span>
+                <h4>Are you sure want to delete <span  class="desc-confirm"></span></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btn-conf-del">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+         $(document).ajaxStart(function () {
+            $("#loader").css("display", "block");
+        });
+        $(document).ajaxComplete(function () {
+            $("#loader").css("display", "none");
+        });
+        var cand_id = 0;
+        var full_name = "";
+        var file_name = "";
+        var position = "";
+        var succ_id = "";
+        var cv_id = 0;
+        var file;
+        var pps_id;
+        $.ajax({
+            url: '@Url.Action("Get","Candidate")',
+            type: 'GET',
+            dataType: 'json',
+            success: function (Data) {
+                if (cand_id == 0) {
+                    $('.tb-list').html("");
+                    for (var i = 0; i < Data.length; i++) {
+                        var status = "";
+                        if (Data[i].status.toLowerCase() == "pass") {
+                            status = "<small class='badge badge-success'> Pass</small> "+Data[i].emp_id+"";
+                        }
+                        $('.tb-list').append(
+                            "<tr cand-id=" + Data[i].cand_id + " full-name='" + Data[i].full_name + "' cv-id='" + Data[i].cv_id + "' style='cursor: pointer;'>" +
+                            "<td>" + (i + 1) + "</td>" +
+                            "<td>" + Data[i].full_name + "</td>" +
+                            "<td>" + Data[i].req_no + "</td>" +
+                            "<td>" + Data[i].proposal + "</td>" +
+                            "<td>" + Data[i].apply_position + "</td>" +
+                            "<td>" + Data[i].apply_date + "</td>" +
+                            "<td>" + status + "</td>" +
+                            "</tr>"
+                        );
+                    }
+                    $('#tb-list-page').DataTable();
+                    $('.dataTables_length').addClass('bs-select');
+                }
+                else {
+                }
+            },
+                 error: function (jqXHR, textStatus, errorThrown) {
+                     alert("Services is unvailable,Please try again later");
+                 }
+        });
+         function GetReq() {
+             $.ajax({
+                 url: '@Url.Action("GetReqByCandID", "Candidate")',
+                 type: 'POST',
+                 dataType: 'json',
+                 cache: false,
+                 data: { id: cand_id},
+                 success: function (Data) {
+                     $('.req-list').html("");
+
+                     for (var i = 0; i < Data.length; i++) {
+                         var prop_list = "";
+                         for (var j = 0; j < Data[i].propoSals.length; j++) {
+                             prop_list += '<li>' +
+                                 '<a href="#" >' +
+                                 '<span title="View Proposal" class="btn-view-pps" pps-id=' + Data[i].propoSals[j].proposal_id + ' file-name="' + Data[i].propoSals[j].file_name +'" class="text-green">' + Data[i].propoSals[j].file_name + '</span>' +
+                                 '<span class="text-gray"> <i class="fas fa-file-upload"></i> upload by : ' + Data[i].propoSals[j].create_by + '</span>' +
+                                 '<div class="tools" style="display: block;">' +
+                                 '<i class="fas fa-trash-alt btn-del-pps"  pps-id=' + Data[i].propoSals[j].proposal_id + ' file-name="' + Data[i].propoSals[j].file_name +'"></i>' +
+                                 '</div>' +
+                                 '</a>'+
+                                 '</li>'
+                         }
+                         var r_s = "warning";
+                         if (Data[i].req_status.toLowerCase() == "open") {
+                             r_s = "success";
+                         }
+                         $('.req-list').append('<div class="card" style="margin-bottom: .2rem;">' +
+                             '<div class="card-header">' +
+                             '<h3 class="card-title" style="font-size: 14px;">' +
+                             '<a class="tap-req" href="@Url.Action("Detail","Requisition")?req_id=' + Data[i].req_id + '&&client_id='+Data[i].client_id+'" target="_blank">' +
+                             '<span class="text">' + Data[i].req_no + '</span > ' +
+                             '<span class="text"> : ' + Data[i].title + '</span>' +
+                             '<span class="text"> <i class="fas fa-drum"></i> ' + Data[i].position +' </span>' +
+                             '<small class="badge badge-' + r_s + '"> ' + Data[i].req_status + '</small>' +
+                             '</a>' +
+                             '</h3>' +
+                             '<div class="card-tools" style="margin: 0px;">' +
+                             '<button type="button" class="btn btn-tool collapsed btn-collap btn-pps"  data-toggle="collapse" data-target="#collapse' + i + '" aria-expanded="false" title="Collapse" succ-id=' + Data[i].succ_id + '>' +
+                             '<i class="fas fa-plus"></i> <i class="fas fa-file-invoice"></i> Proposal Official File' +
+                             '</button>' +
+                             '</div>' +
+                             '</div>' +
+                             '<div class="collapse" data-parent="#accordion" id="collapse' + i +'" >'+
+                             '<div class="card-body">' +
+                             '<div class="row">' +
+                             '<div class="col-6 select-file-' + Data[i].succ_id + '">' +
+                             '</div>' +
+                             '<div class="col-6">' +
+                             '<a type="submit" class="btn btn-success btn-upload-file" style="color: #fff;" succ-id=' + Data[i].succ_id + ' position=' + Data[i].position+'>Upload File' +
+                             '</a>' +
+                             '</div>' +
+                             '</div>'+
+                             '<ul class="todo-list ui-sortable" data-widget="todo-list" style="margin-top: .57rem;">' +
+                             prop_list+
+                             '</ul>'+
+                             '</div>' +
+                             '</div>' +
+                             '</div>'
+                         );
+                     }
+                     if (Data.length == 0) {
+                         $('.req-list').append('<li req-id="">' +
+                             '<span class="text">Data not found</span>' +
+                             '</li>');
+                     }
+                 },
+                 error: function (jqXHR, textStatus, errorThrown) {
+                     alert("Services is unvailable,Please try again later");
+                 }
+             });
+        }
+        function DelPps() {
+            $.ajax({
+                url: '@Url.Action("DeletePpsOfficial", "Candidate")',
+                type: 'POST',
+                dataType: 'json',
+                data: {pps_id:pps_id},
+                success: function () {
+                    $('#confirmDelModal').modal('hide');
+                    GetReq();
+                    swalDefaultSuccess();
+                }
+
+            });
+        }
+        function GetComm() {
+            $.ajax({
+                url: '@Url.Action("GetCommByCandID", "Candidate")',
+                type: 'GET',
+                dataType: 'json',
+                data: { cand_id: cand_id },
+                success: function (Data) {
+                    $('.comm').val(Data);
+                }
+            });
+        }
+        function InsrtComm() {
+            var comm = $('.comm').val();
+              $.ajax({
+                url: '@Url.Action("InsertCommByCandID", "Candidate")',
+                type: 'POST',
+                dataType: 'json',
+                  data: { cand_id: cand_id,comment :comm },
+                  success: function (Data) {
+                      swalDefaultUpdateSucc();
+                      GetComm();
+                }
+            });
+        }
+        //-----------------------upload-file--------------------------//
+        //function Detail() {
+        //    return {
+        //        succ_id: succ_id, position: position
+        //    }
+        //}
+        @*function UpdateProposal() {
+            var det = Detail();
+            $.ajax({
+                url: '@Url.Action("UpdateProposal", "Candidate")',
+                type:'POST',
+                dataType: 'json',
+                data: det,
+                success: function (Data) {
+                    file_name = "";
+                    file_name = Data;
+                    UploadFile();
+                }
+            });
+        }*@
+         var formdata;
+        $(document).on("change", "#fileInput", function () {
+            formdata = new FormData();
+            file = $('#fileInput')[0].files;
+            ValidateSize(file);
+            var fileInput = document.getElementById('fileInput');
+            var sfilename = fileInput.files[0].name;
+            formdata.append(sfilename, fileInput.files[0]);
+        });
+
+        function ValidateSize(file) {
+            var FileSize = file[0].size / 1024 / 1024; // in MB
+            if (FileSize > 150) {
+                $('#fileInput').val('');
+                alert('File size exceeds 150 MB');
+            }
+        }
+
+        function UploadFile() {
+            $('#fileInput').val('');
+            formdata.append('succ_id', succ_id);
+            formdata.append('position', position);
+            $.ajax({
+                url: '@Url.Action("SavePropoSal", "Candidate")',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                cache: false,
+                data: formdata,
+                async: false,
+                success: function (result) {
+                    if (result != "") {
+                        swalDefaultSuccess();
+                    }
+                },
+                error: function (err) {
+                   alert(err.statusText);
+                },
+            });
+            GetReq();
+        }
+        function CheckPps(cand_id) {
+            $.ajax({
+                url: '@Url.Action("CheckPpsID","Candidate")',
+                type: 'GET',
+                dataType: 'json',
+                data: {cand_id:cand_id},
+                success: function (Data) {
+                    if (Data != 0) {
+                        $('#btn-download').prop("disabled", false);
+                    }
+                    else {
+                        $('#btn-download').prop("disabled", true);
+                    }
+                }
+            });
+        }
+        //-----------------------btn--------------------------//
+        //var parent = $('embed.file_name').parent();
+        $('.tb-list').on('click', 'td', function () {
+            cand_id = $(this).closest('tr').attr('cand-id');
+            full_name = $(this).closest('tr').attr('full-name');
+            //cv_id = $(this).closest('tr').attr('cv-id');
+            //$('embed.file_name').remove();
+            @*var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenPPS","Candidate")?cand_id='+cand_id);
+            parent.append(new_item);*@
+            CheckPps(cand_id);
+            $('.cand-name').html("");
+            $('.cand-name').append(full_name);
+            GetReq();
+            GetComm();
+            $('#detailModal').modal();
+        });
+        $('#btn-download').on('click', function () {
+            window.location.href = '@Url.Action("OpenPPS","Candidate")?cand_id='+cand_id;
+        });
+        $(document).on('click', '.btn-upload-file', function (e) {
+            if (file.length > 0) {
+                succ_id = $(this).attr("succ-id");
+                position = $(this).attr("position");
+                UploadFile();
+            }
+            else {
+                $('#fileInput').addClass('error');
+                $('#fileInput').append('<div id="fileInput-error" class="error">This field is required.</div>');
+            }
+        });
+        $(document).on('click', '.btn-collap', function () {
+            file = "";
+            var s_id = $(this).attr("succ-id");
+            $('[class*="select-file"]').each(function () {
+                $(this).children('form').remove();
+            });
+            $('.select-file-' + s_id).append('<form id="uploader"><input id="fileInput" type="file" accept="application/pdf,image/png, image/jpeg,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" name="nfile"></form>');
+        });
+       /* var parent = $('embed.file_name').parent();*/
+        $(document).on('click', '.btn-view-pps', function () {
+            pps_id = $(this).attr('pps-id');
+            @*var file_name = $(this).attr('file-name');
+            var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenPpsFile", "Candidate")?proposal_id=' + pps_id);
+            parent.append(new_item);
+            $('.pps-file-name').html("");
+            $('.pps-file-name').append(file_name);
+            $('#ppsModal').modal();*@
+            var base64num = btoa(pps_id);
+            var encodeuri = encodeURIComponent(base64num);
+            window.open("@Url.Action("OpenPpsFile", "Candidate")?proposal_id=" + encodeuri);
+        });
+        $(document).on('click', '.btn-del-pps', function () {
+            pps_id = $(this).attr('pps-id');
+            var file_name = $(this).attr('file-name');
+            $('.desc-confirm').html("");
+            $('.desc-confirm').append(file_name+" file");
+            $('#confirmDelModal').modal();
+        });
+        $('#btn-conf-del').on('click', function () {
+            DelPps();
+        });
+        $('#btn-save-comm').on('click', function () {
+            InsrtComm();
+        });
+        //---------------------alert--------------------------//
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        function swalDefaultSuccess() {
+            Toast.fire({
+                type: 'success',
+                title: 'Created successfully'
+            })
+        }
+        function swalDefaultUpdateSucc() {
+            Toast.fire({
+                type: 'success',
+                title: 'Update successfully'
+            })
+        }
+    });
+</script>
+

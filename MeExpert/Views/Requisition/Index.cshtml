@@ -1,0 +1,522 @@
+﻿@using MeExpert.Models;
+@using MeExpert.CommonProvide;
+@{ 
+    List<Client> clent = new Management().GetClients();
+    List<Position> pos = new Management().GetPosition();
+    List<FilterReq> year = new Management().GetYesrCreateReq();
+}
+@{
+    ViewBag.Title = "Requisition";
+}
+<style>
+    .filter-status {
+        top: 80px;
+        width: 80px;
+        position: absolute;
+        left: 180px;
+        z-index: 99;
+    }
+
+    .filter-year {
+        top: 80px;
+        width: 80px;
+        position: absolute;
+        left: 302px;
+        z-index: 99;
+    }
+
+    @@media only screen and (min-width: 1366px) {
+        .filter-status {
+            left: 191px;
+        }
+
+        .filter-year {
+            left: 319px;
+        }
+    }
+    .filter-exp {
+        position: absolute;
+        right: 182px;
+        top: 17px;
+        width: 150px;
+    }
+</style>
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <button type="button" class="btn btn-success" id="btn-modal"><i class="fas fa-plus"></i> New Requisition</button>
+            <button type="button" class="btn btn-info" id="new-posi"><i class="fas fa-plus"></i> New Position</button>
+            <span class="row filter-exp">
+                <label style="position:absolute">Export Year</label>
+                <select class="select2 browser-default filter-exp-year" style=" left:66%; width: min-content; position: relative;" name="">
+                    @foreach (FilterReq item in year)
+                    { 
+                        <option value="@item.year">@item.year</option>
+                    }
+                </select>
+            </span>
+            <button type="button" class="btn btn-info" id="btn-export" style="float: right;"><i class="fas fa-file-export"></i> Export Report</button>
+        </div>
+        <div class="card-body">
+            <span class="row filter-status" >
+                <label style="position:absolute">Status</label>
+                <select class="select2 browser-default" id="filter-status" style=" left:66%; width: min-content; position: relative;" name="">
+                    <option value="">All</option>
+                    <option value="Open">Open</option>
+                    <option value="Close">Close</option>
+                </select>
+            </span>
+            <span class="row filter-year" >
+                <label style="position:absolute">Year</label>
+                <select class="select2 browser-default" id="filter-year" style=" left: 49%; width: min-content; position: relative;" name="">
+                    <option value="">All</option>
+                    @foreach (FilterReq item in year)
+                    {
+                        <option value="@item.year" >@item.year</option>
+                    }
+                </select>
+            </span>
+            <table id="tb-list-page" class="table table-sm table-striped table-bordered" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Req No.</th>
+                        <th>Client</th>
+                        <th>Project</th>
+                        <th>Position</th>
+                        <th>Status</th>
+                        <th width="20%">Selected candidate</th>
+                        <th width="11%">Created By</th>
+                    </tr>
+                </thead>
+                <tbody class="tb-list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="formValidate" id="formValidate" method="get">
+                    <div class="col-12 row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <div class="row">
+                                    <label>Req No.</label>
+                                    <span class="badge bg-warning check-reqno" style="display:none;padding: 4px 4px 0px 4px; height: 20px;margin-left: 2%;"><i class="fas fa-exclamation-triangle"></i> Req no is not available.</span>
+                                </div>
+                                <input type="text" class="form-control form-control-sm req_no" name="nreqno" />
+                            </div>
+                        </div>
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label>Project</label>
+                                <input type="text" class="form-control form-control-sm req_title" name="ntitle" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-group">
+                            <label>
+                                Client
+                            </label>
+                            <select class="selectpicker form-control client-id" data-live-search="true">
+                                @foreach (Client item in clent)
+                                {
+                                    <option value="@item.client_id" clent-adrs="@item.client_address" clent-tel="@item.client_tel">@item.client_name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-8 clent-det" style="display:none">
+                        <div class="form-group">
+                            <label>Address &nbsp;</label>
+                            <span class="clent-adrs"></span>
+                        </div>
+                    </div>
+                    <div class="col-4 clent-det" style="display:none">
+                        <div class="form-group">
+                            <label style="margin-left:1%">Tel.&nbsp;</label>
+                            <span class="clent-tel"></span>
+                        </div>
+                    </div>
+                    <div class="col-12 row">
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label>Position</label>
+                                <select class="form-control posi-list select-2">
+                                 
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Headcounter</label>
+                                <input type="number" class="form-control form-control-sm headcounter" name="nnumber" min="0" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <form id="uploader">
+                            @*<div class="row">*@
+                            @*<input type="file" id="fileInput" class="form-control" />*@
+                            <input id="fileInput" type="file" accept="application/pdf,image/png, image/jpeg,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" name="nfile">
+                            @*<br />
+                <br />
+                <table class="table" id="FilesList" style="visibility:hidden">
+                    <tr>
+                        <th>
+                            Attachment(s)
+                        </th>
+                        <th>
+                            Action
+                        </th>
+                    </tr>
+                </table>*@
+                            @*  <input type="button" class="btn btn-outline-primary" id="btnupload" value="Upload" style="float:right" />*@
+                            @*</div>*@
+                        </form>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-save">Create</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="posiModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Position</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="formValidate" id="formValidate" method="get">
+                    <div class="col-12 row">
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label>Position Name</label>
+                                <input type="text" class="form-control form-control-sm posi_name" />
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-save-posi">Create</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+         $(document).ajaxStart(function () {
+            $("#loader").css("display", "block");
+        });
+        $(document).ajaxComplete(function () {
+            $("#loader").css("display", "none");
+        });
+        Get();
+        GetPositionList();
+
+        var new_position = "";
+        var file_name = "";
+        var position_id = 0;
+        var type = "";
+        $('.selectpicker').selectpicker();
+        //$(".selete2-posi").select2({
+        //    tags: true,
+        //    width: '100%',
+        //    insertTag: function (data, tag) {
+        //        // Insert the tag at the end of the results
+        //        data.push(tag);
+        //        new_position = data[0].text;
+        //    }
+        //});
+        $('.select-2').select2({ width: '100%',});
+        $('input.files').fileuploader();
+        function Get() {
+            $.ajax({
+                url: '@Url.Action("GetReq","Requisition")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                data: { req_id:0 },
+                success: function (Data) {
+                        for (var i = 0; i < Data.length; i++) {
+                            var status = "<small class='badge badge-warning'>" + Data[i].req_status + "</small>";
+                            if (Data[i].req_status.toLowerCase() == "close") {
+                                status = "<small class='badge badge-secondary'>" + Data[i].req_status + "</small>";
+                            }
+                            $('.tb-list').append(
+                                "<tr req-id=" + Data[i].req_id + " client-id=" + Data[i].client_id + " style='cursor: pointer;'>" +
+                                "<td><span style='position: absolute;color: #f2f2f2;z-index: -99;'>" + Data[i].create_date + "</span>" + Data[i].req_no + "</td>" +
+                                "<td>" + Data[i].client + "</td>" +
+                                "<td>" + Data[i].title + "</td>" +
+                                "<td>" + Data[i].position + "</td>" +
+                                "<td>" + status + "</td>" +
+                                "<td style='font-size:14px'>" + Data[i].sel_cand + "</td>" +
+                                "<td style='font-size:14px'>"+Data[i].create_by+"</td>" +
+                                "</tr>"
+                            );
+                        }
+                        $('#tb-list-page').DataTable({ "order": [[0, "desc"]] });
+                        $('.dataTables_length').addClass('bs-select');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function CreatePosition(posi_name) {
+            $.ajax({
+                url: '@Url.Action("CreatePosition","Requisition")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                data: { posi_name: posi_name },
+                success: function (Data) {
+                    GetPositionList();
+                    $('#posiModal').modal('hide');
+                   // Update();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function GetPositionList() {
+             $.ajax({
+                url: '@Url.Action("GetPositionList", "Requisition")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                 success: function (Data) {
+                     $('.posi-list').html("");
+                     for (var i = 0; i < Data.length;i++) {
+                         $('.posi-list').append("<option value=" + Data[i].position_id + ">" + Data[i].position_name + "</option>");
+                     }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function Detail() {
+            var req_no = $('.req_no').val();
+            var title = $('.req_title').val();
+            //var position = position_id;
+            //if (position == 0) {
+            var position = $('.posi-list').val();
+            //}
+
+            var client_id = $('.client-id option:selected').val();
+            var headcounter = $('.headcounter').val();
+            return {
+                req_no: req_no, title:title,position_id: position, client_id: client_id, headcounter: headcounter, type: type
+            }
+        }
+
+        function Update() {
+            var det = Detail();
+            $.ajax({
+                url: '@Url.Action("Update","Requisition")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                data: det,
+                success: function (Data) {
+                    if (Data != "") {
+                        UploadFile(Data);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function CheckReqNo() {
+            var req_no = $('.req_no').val();
+            $.ajax({
+                url: '@Url.Action("GetReqNo","Requisition")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                data: { req_no: req_no },
+                success: function (Data) {
+                    if (Data) {
+                        $('#btn-save').prop('disabled', true);
+                        $('.check-reqno').css("display","block");
+                    }
+                    else {
+                        $('#btn-save').prop('disabled', false);
+                        $('.check-reqno').css("display", "none");
+                    }
+                }
+            });
+        }
+        //---------------------alert--------------------------//
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        function swalDefaultSuccess() {
+            Toast.fire({
+                type: 'success',
+                title: 'Created successfully'
+            })
+        }
+        //---------------------btn--------------------------//
+        $('#btn-modal').on('click', function () {
+            $('#ModalLabel').append("New Requisition");
+            $('#detailModal').modal();
+            type = "insert";
+        });
+        $('#btn-save').on('click', function () {
+            //var position = $('.selete2-posi').val();
+            //if (position == new_position) {
+            //    CreatePosition(position);
+            //}
+            //else {
+                if ($('#formValidate').valid()) {
+                    Update();
+                }
+            //}
+        });
+        $('.tb-list').on('click', 'td', function () {
+            var req_id = $(this).closest('tr').attr('req-id');
+            var client_id = $(this).closest('tr').attr('client-id');
+            window.open("@Url.Action("Detail","Requisition")?req_id=" + req_id + "&&client_id=" + client_id);
+        });
+        $('#new-posi').on('click', function () {
+            $('#posiModal').modal();
+        });
+        $('#btn-save-posi').on('click', function () {
+            var posi_name = $('.posi_name').val();
+            CreatePosition(posi_name);
+        });
+        //---------------------change--------------------------//
+        $('.client-id').on('change', function () {
+            var adrs = $('option:selected', this).attr("clent-adrs");
+            var tel = $('option:selected', this).attr("clent-tel");
+            $('.clent-det').css("display", "block");
+
+            $('.clent-adrs').html("");
+            $('.clent-tel').html("");
+
+            $('.clent-adrs').append(adrs);
+            $('.clent-tel').append(tel);
+        });
+        //----------------------focus-out--------------------------//
+        $(document).on('focusout', '.req_no', function () {
+            CheckReqNo();
+        });
+        //----------------------upload-file--------------------------//
+        var formdata; //FormData object
+
+        $("#fileInput").on("change", function () {
+            formdata = new FormData();
+            $("#FilesList tbody").html("");
+            file = $('#fileInput')[0].files;
+            ValidateSize(file);
+            var fileInput = document.getElementById('fileInput');
+                var sfilename = fileInput.files[0].name;
+                formdata.append(sfilename, fileInput.files[0]);
+            chkatchtbl();
+        });
+        function ValidateSize(file) {
+            var FileSize = file[0].size / 1024 / 1024; // in MB
+            if (FileSize > 150) {
+                $('#fileInput').val('');
+                alert('File size exceeds 150 MB');
+            }
+        }
+        function UploadFile(req_id) {
+            $('#fileInput').val('');
+            var req_no = $('.req_no').val();
+            formdata.append('req_id', req_id);
+            formdata.append('req_no', req_no);
+            $.ajax({
+                url: '@Url.Action("SaveFileStream", "Requisition")',
+                type: "POST",
+                contentType: false,
+                processData: false,
+                cache: false,
+                data: formdata,
+                async: false,
+                success: function (result) {
+                    if (result != "") {
+                        swalDefaultSuccess();
+                    }
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                },
+                complete: function () {
+                    setTimeout(function () {
+                        location.reload();
+                    }, 3000);
+                }
+            });
+        }
+
+        function chkatchtbl() {
+            if ($('#FilesList tr').length > 1) {
+                $("#FilesList").css("visibility", "visible");
+            } else {
+                $("#FilesList").css("visibility", "hidden");
+            }
+        }
+        function SearchData() {
+            var table = $('#tb-list-page').DataTable();
+            var value_status = $('#filter-status').val();
+            var value_year = $('#filter-year').val();
+            table
+                .column(4)
+                .search(value_status);
+            table
+                .column(6)
+                .search(value_year)
+                .draw();
+        }
+        $('#filter-status').on('change', function () {
+            SearchData();
+
+        });
+        $('#filter-year').on('change', function () {
+            SearchData();
+
+        });
+          ////---------------------export-mr------------------------//
+        $('#btn-export').on('click', function () {
+            ExportReport();
+        });
+        function ExportReport() {
+            var year = $('.filter-exp-year').val();
+            $.ajax({
+                url: '@Url.Action("ExportExcel", "Requisition")',
+                type: 'POST',
+                dataType: 'json',
+                data: { year: year },
+                success: function (Data) {
+                    window.location = "@Url.Action("ExcelDownload", "Requisition")";
+                }
+            });
+        }
+    });
+</script>

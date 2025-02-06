@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+@using System.Configuration
+@{
+    var azure_ad_url = ConfigurationManager.AppSettings["azure_ad_url"];
+}
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=11" />
+    <title>MS PRO</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/all.css" rel="stylesheet" />
+    <link href="~/Content/adminlte.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-datepicker.css" rel="stylesheet" />
+    <link href="~/Content/jquery.dataTables.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-select.min.css" rel="stylesheet" />
+    <link href="~/Content/select2.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.fileuploader.min.css" rel="stylesheet" />
+    <link href="~/Content/jquery.fileuploader-theme-boxafter.css" rel="stylesheet" />
+    @*<link href="~/Content/ionicons.min.css" rel="stylesheet" />*@
+    <link href="~/Content/toastr.min.css" rel="stylesheet" />
+    <link href="~/Content/sweetalert2.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-toggle.css" rel="stylesheet" />
+    <link href="~/Content/taow.css" rel="stylesheet" />
+    <link href="~/Content/web-font.css" rel="stylesheet" />
+    <script src="~/Scripts/jquery-3.5.1.js"></script>
+    <script src="~/Scripts/umd/popper.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/all.js"></script>
+    <script src="~/Scripts/adminlte.min.js"></script>
+    <script src="~/Scripts/bootstrap-datepicker.js"></script>
+    <script src="~/Scripts/jquery.dataTables.min.js"></script>
+    <script src="~/Scripts/bootstrap-select.min.js"></script>
+    <script src="~/Scripts/select2.full.min.js"></script>
+    <script src="~/Scripts/select2.min.js"></script>
+    <script src="~/Scripts/jquery.fileuploader.min.js"></script>
+    <script src="~/Scripts/sweetalert2.min.js"></script>
+    <script src="~/Scripts/toastr.min.js"></script>
+    <script src="~/Scripts/bootstrap-toggle.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/form-validate.js"></script>
+    @RenderSection("scripts", required: false)
+</head>
+<body class="sidebar-mini layout-fixed control-sidebar-slide-open text-sm">
+    <div class="wrapper">
+        <nav class="main-header navbar navbar-expand text-sm navbar-dark navbar-navy" style="background-image: linear-gradient(45deg,#3949ab,#4fc3f7)!important;z-index: 99;">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="@Url.Action("Index","Home")" class="nav-link">Dashboard</a>
+                </li>
+            </ul>
+        </nav>
+        <aside class="main-sidebar elevation-4 sidebar-light-navy">
+
+            <!-- Brand Logo -->
+            <h5 class="brand-link">
+                <span class="brand-text" style="font-size:20px;color:#3949ab;font-size: 21px;"><i class="far fa-user-circle"></i> MS PRO</span>
+            </h5>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar user panel (optional) -->
+                <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                    <div class="img" style="margin: auto;margin-left: 5px;margin-right:0px">
+                        <i class="fas fa-street-view"></i>
+                    </div>
+                    <div class="info">
+                        <div class="d-block" style="font-size:14px;color:#777;">@HttpContext.Current.User.Identity.Name</div>
+                    </div>
+                </div>
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index","Client")" class="nav-link">
+                                <i class="fas fa-users"></i>
+                                <p>
+                                    Client
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index","Requisition")" class="nav-link">
+                                <i class="fas fa-file-invoice"></i>
+                                <p>
+                                    Requisition
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("ManageCandidate","Candidate")" class="nav-link">
+                                <i class="fas fa-user-tie"></i>
+                                <p>
+                                    Candidate
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Url.Action("Index","Candidate")" class="nav-link">
+                                <i class="fas fa-address-card"></i>
+                                <p>
+                                    Selected Candidate
+                                </p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+            <div class="sidebar-background" style="background-image: url(http://gcgpgcmeapp01/MSPRO/Images/06.a1ccb0cb.jpg)">
+            </div>
+        </aside>
+    </div>
+    <div class="content-wrapper" style="background: #eff1f4;">
+        @*<div class="container body-content">*@
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>@ViewBag.Title</h1>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <div class="content">
+            <div class="container-fluid">
+                <div class="bg-load" id="loader">
+                    <div class="loadingio-spinner-wedges-trgvdqyjh4h">
+                        <div class="ldio-28x3fii487t">
+                            <div><div><div></div></div><div><div></div></div><div><div></div></div><div><div></div></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" tabindex="-1" role="dialog" id="alertBrowserDelModal" style="display:none;z-index: 9999;padding-top: 12%;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <h6>Try again with chrome browser</h6>
+                    <a href="chrome://../Home/Index" id="btn-link-chrome" title="Chrome">
+                        <i style="font-size: 64px;" class="fab fa-chrome"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="main-footer no-printme">
+        <div class="float-right d-none d-sm-inline-block">
+            <b>GCME</b>
+        </div>
+    </footer>
+</body>
+
+</html>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var isIE = false || !!document.documentMode;
+        var isEdge = !isIE && !!window.StyleMedia;
+        if (isIE) {
+            $('#alertBrowserDelModal').modal({ backdrop: 'static', keyboard: false });
+        }
+        if (isEdge) {
+            $('#alertBrowserDelModal').modal({ backdrop: 'static', keyboard: false });
+        }
+        //checkAuthen();
+        var url = new URL(window.location.href); 
+        var token = localStorage.getItem('token');
+        if (token == null) {
+            localStorage.setItem('urlRedirect', url.href);
+            window.location.replace('@azure_ad_url' + 'signin/' + encodeURIComponent(url.href+'Home'));
+        }
+        function checkAuthen() {
+            $.ajax({
+                url: '@Url.Action("UserAuthen", "Home")',
+                type: 'GET',
+                dataType: 'json',
+                async: false,
+                success: function (response) {
+                },
+                error: function (xhr, status, error) {
+                    if (xhr.status === 401) {
+                        localStorage.setItem('urlRedirect', url.href);
+                        window.location.replace('@azure_ad_url' + 'signin/' + encodeURIComponent(url.href));
+                    } else {
+                        console.error('Error:', status, error);
+                    }
+                }
+            });
+        }
+
+
+        if (url.pathname == "/Requisition/Detail") {
+            $('li.nav-item a[href="~/Requisition"]').addClass('active');
+        }
+        else {
+            $('li.nav-item a[href="' + url.pathname + '"]').addClass('active');
+        }
+        $('li.nav-item a').filter(function () {
+            return this.href == url;
+        }).addClass('active');
+        if (navigator.userAgent.indexOf('MSIE') !== -1
+            || navigator.appVersion.indexOf('Trident/') > -1) {
+            $('.sidebar-background').hide();
+        }
+
+    });
+</script>

@@ -1,0 +1,483 @@
+﻿@using MeExpert.Models;
+@using MeExpert.CommonProvide;
+@{
+    var a = new Management();
+    List<Education> major = a.GetInst("major");
+    List<Education> faculty = a.GetInst("faculty");
+    List<ApplyRecord> ind = a.GetExperience("industry");
+    List<ApplyRecord> keyw = a.GetExperience("keyword");
+}
+@{
+    ViewBag.Title = "Candidate";
+}
+
+<style>
+    .filter-option-inner-inner {
+        color: #212529;
+        font-weight: 700;
+    }
+
+    .btn-cand {
+        padding: 0px 8px 0px 8px;
+        font-size: .875rem !important;
+    }
+
+    a.line-cont {
+        color: #007bff !important;
+    }
+
+        a.line-cont:hover {
+            color: #007bff !important;
+            border-bottom: 1px solid #007bff;
+            cursor: pointer;
+        }
+
+    .tooltip > .tooltip-inner {
+        background-color: #007bff;
+        color: white;
+        font-size: 12px;
+    }
+
+    .todo-list > li .tools {
+        display: block;
+        font-size: 18px;
+        color: #138496;
+        cursor: pointer;
+    }
+</style>
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <button type="button" class="btn btn-success" id="btn-modal"><i class="fas fa-plus"></i> New Candidate</button>
+            <div class="card-tools">
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#searchModal"><i class="fas fa-filter"></i> Filter</button>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <table id="tb-list-page" class="table table-sm table-striped table-bordered table-responsive" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th style="min-width: 49px;">Action</th>
+                        <th>No.</th>
+                        <th>Gender</th>
+                        <th style="min-width: 151px;">Full Name</th>
+                        <th>Age</th>
+                        <th style="min-width: 158px;">Lastest Apply Position</th>
+                        <th style="min-width: 76px;">Mobile No.</th>
+                        <th>Mail</th>
+                        <th>Remark</th>
+                        <th style="min-width: 69px;">Create By</th>
+                    </tr>
+                </thead>
+                <tbody class="tb-list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="cvModal" style="z-index: 9999;">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 1200px; height: 594px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title full-name"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" style="height: 543px; ">
+                <div class="col-12 text-center">
+                    <embed class="file_name" width="1160px" height="500px" />
+                </div>
+            </div>
+            @*<div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>*@
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="searchModal">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 835px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Advanced Search</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-6 row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label>Employed Status</label>
+                            <select class="form-control form-control-sm emp_status">
+                                <option value="">All Status</option>
+                                <option value="Unemployed">Unemployed</option>
+                                <option value="Employed">Employed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label>Apply Date</label>
+                            <select class="form-control form-control-sm apply_date">
+                                <option value="">Any Time</option>
+                                <option value="month">This Month</option>
+                                <option value="3m">3 Month</option>
+                                <option value="year">This Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 row">
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label>Remark</label>
+                            <textarea class="form-control form-control-sm remark"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label>Gender</label>
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" name="gender" type="checkbox" id="male" value="male">
+                                <label for="male" class="custom-control-label" style="color:#3873b3;font-weight: 400;"><i class="fas fa-male"></i> Male</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input" name="gender" type="checkbox" id="female" value="female">
+                                <label for="female" class="custom-control-label" style="color:#d65a93;font-weight: 400;"><i class="fas fa-female"></i> Female</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="age" id="age-all" value="" checked>
+                                <label class="form-check-label" for="age-all" style="font-weight: 400;">
+                                    All
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="age" id="not-over" value="not-over" style="margin-top:4%">
+                                <label class="form-check-label" for="not-over" style="font-weight: 400;">
+                                    Not Over
+                                    <input type="number" class="form-control form-control-sm age" style="width: 25%;height: 22px;display: inherit;margin-top:2%" />
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="age" id="between" value="between" style="margin-top:4%">
+                                <label class="form-check-label" for="between" style="font-weight: 400;">
+                                    Between
+                                    <input type="number" class="form-control form-control-sm age" style="width: 25%;height: 22px;display: inherit;margin-top:2%;margin-left: 1.7%;" /> - <input type="number" class="form-control form-control-sm age" style="width: 25%;height: 22px;display: inherit;" />
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 row">
+                    <div class="col-12">
+                        <h6>Education</h6>
+                        <hr />
+                    </div>
+                    <div class="col-2">
+                        <div class="form-group">
+                            <label>Toeic <span style="font-weight: 300;font-size: 14px;">(more than)</span></label>
+                            <input type="number" class="toeic form-control form-control-sm toeic" />
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label>Degree</label>
+                            <select class="form-control form-control-sm degree">
+                                <option value="" selected>All Degree</option>
+                                <option value="Bachelor">Bachelor</option>
+                                <option value="Doctoral">Doctoral</option>
+                                <option value="Master">Master</option>
+                                <option value="Diploma/High Vocational">Diploma/High Vocational</option>
+                                <option value="Vocational">Vocational</option>
+                                <option value="High School">High School</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label>Faculty</label>
+                            <select class="form-control form-control-sm faculty select-2" style="position: inherit !important;width: 100%;" data-live-search="true" name="faculty">
+                                <option value="">All Faculty</option>
+                                @foreach (Education item in faculty)
+                                {
+                                    <option value="@item.faculty">@item.faculty</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label>Major</label>
+                            <select class="form-control form-control-sm major select-2" style="position: inherit !important;width: 100%;" data-live-search="true" name="major">
+                                <option value="">All Major</option>
+                                @foreach (Education item in major)
+                                {
+                                    <option value="@item.major">@item.major</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 row">
+                    <div class="col-12">
+                        <h6>Experience</h6>
+                        <hr />
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label>Industry</label>
+                            <select class="form-control form-control-sm select-2 industry" style="position: inherit !important;width: 100%;" data-live-search="true">
+                                <option value="">All Industry</option>
+                                @foreach (ApplyRecord item in ind)
+                                {
+                                    <option value="@item.industry">@item.industry</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="form-group">
+                            <label>Keyword</label>
+                            <select class="form-control form-control-sm select-2 keyword" style="position: inherit !important;width: 100%;" data-live-search="true">
+                                <option value="">All Keyword</option>
+                                @foreach (ApplyRecord item in keyw)
+                                {
+                                    <option value="@item.keyword">@item.keyword</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-info" id="btn-search">Filter</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div class="modal" tabindex="-1" role="dialog" id="detailModal" >
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 835px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Candidate Detail</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" id="btn-create-prs">Create</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>*@
+<script type="text/javascript">
+    $(document).ready(function () {
+        //$(".selete2-inst-name").select2({
+        //    tags: true,
+        //    width: '100%',
+        //    insertTag: function (data, tag) {
+        //        // Insert the tag at the end of the results
+        //        data.push(tag);
+        //        new_edu = data[0].text;
+        //    }
+        //});
+        $(document).ajaxStart(function () {
+            $("#loader").css("display", "block");
+        });
+        $(document).ajaxComplete(function () {
+            $("#loader").css("display", "none");
+        });
+        $('.select-2').select2();
+        var cand_id = 0;
+        var table="";
+        Get();
+        //$("#loader").css("display", "none");
+        function Get() {
+            $.ajax({
+                url: '@Url.Action("GetCand","Candidate")',
+                type: 'GET',
+                dataType: 'json',
+                success: function (Data) {
+                    $('.tb-list').html("");
+                    $('#tb-list-page').DataTable().clear().destroy();
+                    for (var i = 0; i < Data.length; i++) {
+                        var cv_view = "";
+                        var comma = ",";
+                        var remtext = "";
+                        if (Data[i].create_by == "") {
+                            comma = "";
+                        }
+                        if (Data[i].cv_id == 0) {
+                            cv_view = " disabled "
+                        }
+                        if (Data[i].remarks != "") {
+                            remtext = "<a class='over-text-desc line-cont' data-toggle='tooltip' title='" + Data[i].remarks + "'>" + Data[i].remarks + "</a>";
+                        }
+                        $('.tb-list').append(
+                            "<tr cand-id=" + Data[i].cand_id + " full-name='" + Data[i].full_name + "' cv-id=" + Data[i].cv_id + " style='cursor: pointer;'>" +
+                            "<td><button class='btn btn-info btn-sm' name='cv-view' title='View' style='padding: 3px 8px;margin-right: 4%;' " + cv_view + " ><i class='fas fa-eye' style='font-size: 13px;margin-top: 3px;'></i></button><button class='btn btn-primary btn-sm' name='cand-det' title='Detail'  style='padding: 3px 7px;' target='_blank'><i class='fas fa-edit'></i></button></td>" +
+                            "<td>" + Data[i].no + "</td>" +
+                            "<td>" + Data[i].gender + "</td>" +
+                            "<td>" + Data[i].full_name + "</td>" +
+                            "<td>" + Data[i].age + "</td>" +
+                            "<td>" + Data[i].last_apply_position + "</td>" +
+                            "<td>" + Data[i].mobile + "</td>" +
+                            "<td>" + Data[i].mail + "</td>" +
+                            "<td>" + remtext + "</td>" +
+                            "<td>" + Data[i].create_by + comma + "<br/> " + Data[i].create_date + "</td>" +
+                            "</tr>"
+                        );
+                    }
+                    TooltipTb();
+                    table = $('#tb-list-page').DataTable();
+                    $('.dataTables_length').addClass('bs-select');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function detSearch() {
+            var arr_gen = [];
+            var str_age = "";
+            var emp_status = $('.emp_status option:selected').val();
+            var month = $('.apply_date option:selected').val();
+            var remark = $('.remark').val();
+            $('input[name="gender"]:checked').each(function () {
+                arr_gen.push($(this).val());
+            });
+            if (arr_gen.length > 1) {
+                arr_gen[0] = "";
+            }
+            var gender = arr_gen[0];
+            $('.age').each(function () {
+                var a = $(this).val();
+                if (a != undefined && a != "") {
+                    str_age += (a + ",");
+                }
+            });
+            var age = str_age;
+            var toeic = $('.toeic').val();
+            var degree = $('.degree option:selected').val();
+            var faculty = $('.faculty option:selected').val();
+            var major = $('.major option:selected').val();
+            var industry = $('.industry option:selected').val();
+            var keyword = $('.keyword option:selected').val();
+            return {
+                emp_status: emp_status, month: month, remark: remark, gender: gender, age: age, toeic: toeic, degree: degree, faculty: faculty,
+                major: major, industry: industry, keyword: keyword
+            }
+        }
+        function Search() {
+            var det = detSearch();
+            $.ajax({
+                url: '@Url.Action("AdvSearch","Candidate")',
+                type: 'GET',
+                dataType: 'json',
+                data: det,
+                success: function (Data) {
+                    $('.tb-list').html("");
+                    $('#tb-list-page').DataTable().clear().destroy();
+                    for (var i = 0; i < Data.length; i++) {
+                        var cv_view = "";
+                        var comma = ",";
+                        var remtext = "";
+                        if (Data[i].create_by == "") {
+                            comma = "";
+                        }
+                        if (Data[i].cv_id == 0) {
+                            cv_view = " disabled "
+                        }
+                        if (Data[i].remarks != "") {
+                            remtext = "<a class='over-text-desc line-cont' data-toggle='tooltip' title='" + Data[i].remarks + "'>" + Data[i].remarks + "</a>";
+
+                        }
+                        $('.tb-list').append(
+                            "<tr cand-id=" + Data[i].cand_id + " full-name='" + Data[i].full_name + "' cv-id=" + Data[i].cv_id + " style='cursor: pointer;'>" +
+                            "<td><button class='btn btn-info btn-sm' name='cv-view' title='View' style='padding: 3px 8px;margin-right: 4%;' " + cv_view + "><i class='fas fa-eye' style='font-size: 13px;margin-top: 3px;'></i></button><button class='btn btn-primary btn-sm' name='cand-det' title='Detail'  style='padding: 3px 7px;'><i class='fas fa-edit'></i></button></td>" +
+                            "<td>" + Data[i].no + "</td>" +
+                            "<td>" + Data[i].gender + "</td>" +
+                            "<td>" + Data[i].full_name + "</td>" +
+                            "<td>" + Data[i].age + "</td>" +
+                            "<td>" + Data[i].last_apply_position + "</td>" +
+                            "<td>" + Data[i].mobile + "</td>" +
+                            "<td>" + Data[i].mail + "</td>" +
+                            "<td >" + remtext + "</td>" +
+                            "<td>" + Data[i].create_by + comma + "<br/> " + Data[i].create_date + "</td>" +
+                            "</tr>"
+                        );
+
+                    }
+                    table = $('#tb-list-page').DataTable();
+                    $('.dataTables_length').addClass('bs-select');
+                    TooltipTb();
+                    $('#searchModal').modal('hide');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function TooltipTb() {
+            $('body').tooltip({
+                selector: '[data-toggle="tooltip"]',
+                placement: 'auto',
+                fallbackPlacement: 'flip',
+                container: 'body'
+            });
+        }
+        //-----------------------btn--------------------------//
+      /*  var parent = $('embed.file_name').parent();*/
+        $(document).on('click', 'button[name="cv-view"]', function () {
+            cv_id = $(this).closest('tr').attr('cv-id');
+            //full_name = $(this).closest('tr').attr('full-name');
+            //$('.full-name').html("");
+            //$('.full-name').append(full_name);
+            //$('.cv-pdf').css("display", "block");
+            //$('.cv-pdf-not-found').css("display", "none");
+            ////$('embed.file_name').remove();
+            ////var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenCvFile","Candidate")?cv_id=' + cv_id);
+            //parent.append(new_item);
+            //$('#cvModal').modal();
+            var base64num = btoa(cv_id);
+            var encodeuri = encodeURIComponent(base64num);
+            window.open("@Url.Action("OpenCvFile", "Candidate")?cv_id=" + encodeuri + "")
+        });
+        $('#btn-modal').on('click', function () {
+            window.location.href = "@Url.Action("Detail","Candidate")?cand_id=0";
+        });
+        $(document).on('click', '[name="cand-det"]', function () {
+            cand_id = $(this).closest('tr').attr('cand-id');
+            window.open("@Url.Action("Detail","Candidate")?cand_id=" + cand_id);
+        });
+        $('#btn-search').on('click', function () {
+            Search();
+        });
+        var a = "";
+        $('input.age').on('click', function () {
+            var ckeck_name = $(this).closest('.form-check').find('[name="age"]').val();
+            if (a != ckeck_name) {
+                $('.age').val('');
+            }
+            $('[value="' + ckeck_name + '"]').prop("checked", true);
+            a = ckeck_name;
+        });
+        $('input[name="age"]').on('click', function () {
+            $('.age').val('');
+        });
+    });
+</script>

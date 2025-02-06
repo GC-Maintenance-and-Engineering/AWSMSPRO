@@ -1,0 +1,1556 @@
+﻿@using MeExpert.Models;
+@using MeExpert.CommonProvide;
+@{
+    var a = new Management();
+    List<Client> clent = a.GetClients();
+    List<Position> pos = a.GetPosition();
+    List<Cand> cand = a.GetCands();
+    List<Cand> cand_by_req = a.GetCandByReq(ViewBag.ReqID);
+    List<ContactPerson> cont_prs = a.GetPrsByClientID(ViewBag.ClientID);
+
+    System.Threading.Tasks.Task<List<UserApi>> intwer = System.Threading.Tasks.Task.Run<List<UserApi>>(async () => await a.GetUserList());
+    var usr_intwer = intwer.Result;
+}
+@{
+    ViewBag.Title = "Requisition Detail";
+}
+<link href="~/Content/summernote.min.css" rel="stylesheet" />
+<script src="~/Scripts/summernote.min.js"></script>
+<style>
+    .filter-option-inner-inner {
+        color: #212529;
+        font-weight: 700;
+    }
+
+    .btn-cand {
+        padding: 0px 8px 0px 8px;
+        font-size: .875rem !important;
+    }
+
+    a.line-cont {
+        color: #007bff !important;
+    }
+
+        a.line-cont:hover {
+            color: #007bff !important;
+            border-bottom: 1px solid #007bff;
+            cursor: pointer;
+        }
+
+    .tooltip > .tooltip-inner {
+        background-color: #007bff;
+        color: white;
+        font-size: 12px;
+    }
+   
+    .todo-list > li .tools {
+        display: block;
+        font-size: 18px;
+        color: #138496;
+        cursor: pointer;
+    }
+</style>
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <div class="form-group" style="position: absolute;">
+                <input type="checkbox" checked data-toggle="toggle" data-on="Open" data-off="Close" data-onstyle="warning" data-offstyle="secondary" id="status">
+                <span class="status_date"></span>
+            </div>
+            <div class="card-tools">
+                <button class="btn btn-info" id="upload-req-file"><i class="fas fa-file-upload"></i> Upload Requisition file</button>
+                <button class="btn btn-primary btn-pdf-view"><i class="fas fa-file-pdf"></i> Preview Requisition</button>
+                <button class="btn btn-danger" id="btn-del"><i class="fas fa-trash"></i> Delete</button>
+                <button class="btn btn-success" id="btn-save"><i class="fas fa-save"></i> Save</button>
+            </div>
+        </div>
+        <div class="card-body" style="padding-top: 0px;padding-bottom: 0px;">
+            <form class="formValidate" id="formValidate" method="get">
+                <div class="row">
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label>Req No.</label>
+                            <input type="text" class="form-control form-control-sm  req_no" name="nreqno" style="width:100%" />
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-group">
+                            <label>Project</label>
+                            <input type="text" class="form-control form-control-sm  req_title" name="ntitle" style="width:100%" />
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="form-group">
+                            <label>Create Date</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-calendar-alt text-info"></i></span>
+                                </div>
+                                <input type="text" class="form-control form-control-sm create_date" disabled>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6" style="background: #fafbfc;height:100%">
+                        <label>Client</label>
+                        <div class="form-group">
+                            <select class="selectpicker form-control client-id" data-live-search="true">
+                                @foreach (Client item in clent)
+                                {
+                                    <option value="@item.client_id" clent-adrs="@item.client_address" clent-tel="@item.client_tel">@item.client_name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group" style="color: #808285;">
+                            <div class="col-12">
+                                <label>Address &nbsp;</label>
+                                <span class="clent-adrs"></span>
+                                <label style="margin-left: 1% ">Tel.&nbsp;</label>
+                                <span class="clent-tel"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <label>Position</label>
+                                        <select class="form-control-sm selete2-posi" style="width: 100%;color: black;font-weight: 600;">
+                                            @foreach (Position item in pos)
+                                            {
+                                                <option value="@item.position_id">@item.position_name</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label>Headcounter</label>
+                                        <input type="number" min="0" style="width:100%" class="form-control-sm headcounter" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label>Note</label>
+                            <div class="form-group">
+                                <textarea style="width: 100%;" type="text" class="form-control-sm remark box-size"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-tools">
+                <button class="btn btn-success" id="btn-add-cv"><i class="fas fa-plus"></i> Add Candidate</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-sm table-hover table-bordered" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>No.</th>
+                        <th>Candidate Name</th>
+                        <th>Sent<span class="count-send badge badge-warning"></span></th>
+                        <th>CV Return</th>
+                        <th>interview 1</th>
+                        <th>interview 2</th>
+                        <th>interview 3</th>
+                        <th>Status</th>
+                        <th style="width: 26%;">Remark</th>
+                    </tr>
+                </thead>
+                <tbody class="tb-list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">
+                <strong style="color: #6c757d;"><i class="fas fa-stamp"></i>  Requisition Success</strong>
+            </h3>
+            <div class="card-tools">
+                <button class="btn btn-primary btn-select-cand"><i class="fas fa-clipboard-check"></i> Select Candidate</button>
+            </div>
+        </div>
+        <div class="card-body">
+            <form class="formValidate" id="formValidate" method="get">
+                <div class="col-12 row">
+                    <div class="col-4">
+                        <div class="form-group">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-info elevation-1"><i class="fas fa-calendar-alt"></i></span>
+                                <div class="info-box-content">
+                                    <div class="col-12" style="position: absolute;">
+                                        <span class="info-box-text" style=" margin-bottom: 2%;">Start Requisition Date</span>
+                                        <input type="text" class="datepicker form-control-sm create-succ col-6" />
+                                        @*  <span>&nbsp;&nbsp;-&nbsp;&nbsp;</span>*@
+                                        @*<input type="text" class="datepicker form-control-sm enddate col-5" name="nenddate"/>*@
+                                        <span class="info-box-number">
+                                            <span><strong style="color: #6c757d;" class="dur-date"></strong></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <!-- /.info-box-content -->
+                            </div>
+                            <!-- /.info-box -->
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <table class="table table-sm table-hover table-bordered" style="width: 100%">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Candidate Name</th>
+                                    <th>Employee ID</th>
+                                    <th>Start Working  Date</th>
+                                    <th style="border: 1px solid #ffffff;"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="tb-list-selected">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@*<div class="modal" tabindex="-1" role="dialog" id="pdfModal" style="z-index: 9999;">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 835px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title pdf-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <embed class="file_name" width="800px" height="350px"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>*@
+<div class="modal" tabindex="-1" role="dialog" id="addCvModal">
+    <div class="modal-dialog modal-xl" role="document" style="margin-top: 5px; margin-bottom: 5px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title cv-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="col-12 cand-det right" style="display:none;">
+                    <button class="btn btn-primary" id="btn-cv-view" style="float:right"><i class="fas fa-eye"></i> Preview CV</button>
+                </div>
+                <div class="col-10">
+                    <div class="form-group">
+                        <label>Candidate</label>
+                        <select class="selectpicker form-control search-cand" data-live-search="true">
+                            @foreach (Cand item in cand)
+                            {
+                                <option data-tokens="@item.gender @item.mobile_no_1 @item.mail" cv-id="@item.cv_id" value="@item.cand_id" gender="@item.gender" mail="@item.mail" mobile="@item.mobile_no_1" position="@item.apply_position" cname="@item.first_name @item.last_name" apply-date="@item.apply_date" exp-salary="@item.exp_salary">@item.apply_position : @item.first_name @item.last_name  </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-12 cand-add" style="display:none">
+                    <div class="col-3">
+                        <p><strong style="color: #6c757d;"><span class="g-icon"></span>Gender : </strong><span class="gender"></span></p>
+                    </div>
+                    <div class="row col-12">
+                        <div class="col-6">
+                            <p><strong style="color: #6c757d;"><i class="fas fa-mobile-alt"></i> Mobile : </strong><span class="mobile"></span></p>
+                        </div>
+                        <div class="col-6">
+                            <p><strong style="color: #6c757d;"><i class="fas fa-envelope"></i> Mail : </strong><span class="mail"></span></p>
+                        </div>
+                    </div>
+                    <div class="row col-12">
+                        <div class="col-6">
+                            <p><strong style="color: #6c757d;"><i class="fas fa-comment-dollar"></i> Expect Salary : </strong><span class="exp_salary"></span></p>
+                        </div>
+                        <div class="col-6">
+                            <p><strong style="color: #6c757d;"><i class="far fa-calendar"></i> Apply Date : </strong><span class="apply_date"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 cand-add text-center" style="display:none">
+                    <embed class="pre_cv" width="800px" height="450px" />
+                </div>
+                <div class="cand-det" style="display:none;margin-top: 2%;">
+                    <div class="card box-status">
+                        <div class="card-body">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="col-12">
+                                            <div class="row">
+                                                <div class="form-group" style="float:right">
+                                                    <span>
+                                                        <span>
+                                                            <strong style="color: #6c757d;">Status</strong>
+                                                        </span>
+                                                        <span class="cand-status"></span>
+                                                    </span>
+
+                                                </div>
+
+                                                @*<div class="form-group" style="position: absolute; right: 0;">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input check-status" type="checkbox" id="cb" value="false">
+                                <label for="cb" class="custom-control-label text-blue"><i class="fas fa-paper-plane"></i> Send</label>
+                            </div>
+                        </div>*@
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea class="form-control remark-status box-size" placeholder="Remark"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group" style="margin-top: 4%;">
+                                            <label style=" color: #6c757d;"><i class="fas fa-paper-plane"></i> Sent Date</label>
+                                            <input class="form-control-sm datepicker sent_date" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label style=" color: #6c757d;"><i class="fas fa-undo"></i> CV Return</label>
+                                            <input class="form-control-sm datepicker cv_return" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="cand-det first-box" style="display:none">
+                    <div class="card box-inter" box-inter="1">
+                        <div class="card-body">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-tool" name="box-inter-del" style="float:right;" disabled>
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <strong style="color: #6c757d;"><i class="fas fa-feather"></i> Interview <span class="count-inter">1</span></strong>
+                                            </span>
+                                            <span style="float:right">
+                                                <span>Date</span>
+                                                <input class="form-control-sm datepicker" />
+                                            </span>
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea class="form-control remark box-size" name="remark1" placeholder="Remark"></textarea>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <span>
+                                                <strong style="color: #6c757d;"><i class="fas fa-user-friends"></i> Interviewer</strong>
+                                            </span>
+                                        </div>
+                                        <div class="form-group">
+                                            @*<div class="intwer-list">
+                                        <div class="row" style="margin-bottom: 0.25rem;">
+                                            <input style="width: 90%;margin-right: 2%;" class="form-control-sm" value="" />
+                                            <button name="intwer-del" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </div>*@
+                                            @*<div class="row">
+                                        <select class="selectpicker form-control interviewer-id" data-live-search="true" style="width:90%;margin-right:0.5rem;">
+
+                                            @foreach (UserApi item in usr_intwer)
+                                            {
+                                                <option data-tokens="" value="@item.strUsername" intwer-name="@item.strFullname">@item.strFullname ( @item.strPosition )</option>
+                                            }
+                                        </select>
+                                    </div>*@
+                                            <select class="cont-list selectpicker form-control form-control-sm" multiple>
+                                                @foreach (ContactPerson item in cont_prs)
+                                                {
+                                                    <option value="@item.cont_id">@item.cont_person_name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="btn-inter-box" class="btn btn-secondary cand-det" type="button" style="float:right;display:none">Add</button>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger float-left" id="btn-del-cv">Delete Candidate</button>
+                <button type="button" class="btn btn-success" id="btn-save-cv">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="selCandModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title cand-title"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formValidateSucc" class="formValidateSucc">
+                    <div class="col-12">
+                        <div class="form-group">
+                            <select class="selectpicker form-control cand-succ" name="sel_cand" data-live-search="true">
+                                @foreach (Cand item in cand_by_req)
+                                {
+                                    <option value="@item.cand_id" req-cand-id="@item.req_cand_id">@item.full_name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    @*<div class="col-8">
+                            <div class="form-group">
+                                <label>
+                                    Employee ID
+                                </label>
+                                <input type="text" class="form-control-sm emp_id" name="nemp_id" />
+                            </div>
+                        </div>*@
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-save-select-cand">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="confirmDelModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <span><i class="fas fa-exclamation-circle text-warning" style="font-size:60px;"></i></span>
+                <h4>Delete candidate </h4>
+                <h5 class="cand-name"></h5>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btn-conf-del-cand">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="confirmDelReqModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <span><i class="fas fa-exclamation-circle text-warning" style="font-size:60px;"></i></span>
+                <h4>Are you sure want to delete requisition number <span class="req-no"></span></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btn-conf-del-req">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="proposalModal">
+    <div class="modal-dialog modal-lg" role="document" style="margin-top: 11px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title"><i class='fas fa-file-alt' style="color:#138496"></i> Proposal detail of <span class="prps-title"></span></h6>
+
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formValidatePps">
+                    <div class="col-12 row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label>Contract Period</label>
+                                <div class="row">
+                                    <input type="text" style="margin-left: 1%;" class="form-control form-control-sm datepicker start_date col-5" name="start_date" />
+                                    <span style="margin-left: 1%;">-</span>
+                                    <input type="text" style="margin-left: 1%;" class="form-control form-control-sm datepicker end_date col-5" name="end_date" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3" style="margin-left: -5%;">
+                            <div class="form-group">
+                                <label>Working Date</label>
+                                <select class="form-control form-control-sm working_date" name="working_date">
+                                    <option value="5">5 Days per week</option>
+                                    <option value="6">6 Days per week (supervisor)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <label style="font-size: 14px;">Create Date of Proposal</label>
+                                <input type="text" class="form-control form-control-sm datepicker proposal_date" name="proposal_date" />
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="col-12 row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label>Scope of Services</label>
+                    <form method="post">
+                        <textarea id="summernote" class="scope_service" name="editordata"></textarea>
+                    </form>
+                </div>
+            </div>
+        </div>*@
+                    <div class="col-12 row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label>Scope of Services</label>
+                                <textarea class="scope_service form-control form-control-sm box-size" name="scope_service"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <h6 style="color: #138496;">Employee Actual Salary</h6>
+                    <hr />
+                    <div class="col-12 row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Actual salary (THB/Month)</label>
+                                <input type="number" class="form-control form-control-sm act_salary" name="act_salary" />
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <div class="form-group">
+                                <label style="font-size: 14px;">Period (Month)</label>
+                                <input type="number" class="form-control form-control-sm period" name="period" />
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="col-12 row">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Compensation</label>
+                                <input type="number" class="form-control form-control-sm pps_comp" name="pps_comp" />
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Special software /License</label>
+                                <input type="number" class="form-control form-control-sm pps_license" name="pps_license" />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <ul class="todo-list ui-sortable pps-list" data-widget="todo-list" style="margin-top: .57rem;">
+                    </ul>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-save-pps">Save Change</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="uploadFileModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Requisition file</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="formValidateUploadFile" id="formValidateUploadFile" method="get">
+                    <div class="col-12">
+                        <form id="uploader">
+                            <input id="fileInput" type="file" accept="application/pdf,image/png, image/jpeg,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" name="nfile">
+                        </form>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="btn-save-upload-req">Upload file</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+        $(document).ready(function () {
+            $(document).ajaxStart(function () {
+                $("#loader").css("display", "block");
+            });
+            $(document).ajaxComplete(function () {
+                $("#loader").css("display", "none");
+            });
+            var file_name = "";
+            var req_id = "@ViewBag.ReqID";
+            var candidate_id = 0;
+            var req_cand_id = 0;
+            var arr_intview = [];
+            var arr_intviewer = [];
+            var type_cand = "";
+            var type_succ = "";
+            var succ_id = 0;
+            var conf_del = "";
+            var cv_id = 0;
+            var req_no = "";
+            var s_work_date = "";
+            var s_date = "";
+            var format_date = {
+                format: 'dd-M-yyyy',
+                todayHighlight: true,
+                daysOfWeekDisabled: '0,6'
+            }
+            var position_id = 0;
+            var new_position = "";
+            var position_name = "";
+            $('.datepicker').datepicker(format_date);
+            $('#req-status').bootstrapToggle({
+                on: 'Open',
+                off: 'Close'
+            });
+            $(".selete2-posi").select2({
+                //tags: true,
+                width: '100%',
+                //insertTag: function (data, tag) {
+                //    data.push(tag);
+                //    new_position = data[0].text;
+                //}
+            });
+
+            $('.selectpicker').selectpicker();
+            Get();
+
+
+            function Get() {
+                $.ajax({
+                    url: '@Url.Action("GetReq","Requisition")',
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+                    data: { req_id: "@ViewBag.ReqID" },
+                    success: function (Data) {
+                        $('.dur-date').html("");
+                        $('.status_date').html("");
+                        if (Data[0].req_status == "Open") {
+                            $('#status').bootstrapToggle('on');
+                        }
+                        else {
+                            //if (Data[0].s_date != undefined && Data[0].close_date != undefined) {
+                            $('.status_date').append("update " + Data[0].close_date).css("color", "gray");
+                            //}
+                            $('#status').bootstrapToggle('off');
+                        }
+                        s_date = Data[0].s_date;
+                        $('.req_no').val(Data[0].req_no);
+                        $('.req_title').val(Data[0].title);
+                        $('.headcounter').val(Data[0].headcounter);
+                        $('.create_date').val(Data[0].create_date);
+                        $('.create-succ').val(Data[0].s_date);
+                        $('.close_date').val(Data[0].close_date);
+                        $('.remark').val(Data[0].remark);
+                        req_no = Data[0].req_no;
+
+                        clnt_id = Data[0].client_id;
+                        $('.client-id').selectpicker('val', Data[0].client_id);
+                        $('.clent-adrs').html("");
+                        $('.clent-tel').html("");
+
+                        $('.clent-adrs').append($('option:selected', '.selectpicker').attr("clent-adrs"));
+                        $('.clent-tel').append($('option:selected', '.selectpicker').attr("clent-tel"));
+
+                        $('.selete2-posi').val(Data[0].position_id).trigger('change');
+                         GetCV();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            };
+
+            function GetCV() {
+                $.ajax({
+                    url: '@Url.Action("GetCv","Requisition")',
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+                    data: { req_cand_id: req_cand_id, req_id: "@ViewBag.ReqID" },
+                    success: function (Data) {
+                        var count_send = 0;
+                        if (req_cand_id == 0) {
+                            $('.tb-list').html("");
+                            $('.search-cand option').prop("disabled", false);
+                            for (var i = 0; i < Data.length; i++) {
+                                var count = 0;
+                                var v1 = "", v2 = "", v3 = "";
+                                var v_list = "";
+                                for (var j = 0; j < Data[i].interviews.length; j++) {
+
+                                    var cont_name = "";
+                                    count++
+
+                                    for (var n = 0; n < Data[i].interviews[j].contacts.length; n++) {
+                                        if (cont_name != "") {
+                                            cont_name += ", ";
+                                        }
+                                        cont_name += Data[i].interviews[j].contacts[n].cont_person_name;
+                                    }
+                                    if (count == 1) {
+                                        v1 = Data[i].interviews[j].interview_date;
+                                        v1 = "<a class='line-cont' data-toggle='tooltip' title='" + cont_name + "'>" + v1 + "</a>";
+                                    }
+                                    else if (count == 2) {
+                                        v2 = Data[i].interviews[j].interview_date;
+                                        v2 = "<a class='line-cont' data-toggle='tooltip' title='" + cont_name + "'>" + v2 + "</a>";
+                                    }
+                                    else if (count == 3) {
+                                        v3 = Data[i].interviews[j].interview_date;
+                                        v3 = "<a class='line-cont' data-toggle='tooltip' title='" + cont_name + "'>" + v3 + "</a>";
+                                    }
+
+
+                                }
+                                var badge = "";
+                                if (Data[i].status != "") {
+                                    badge = "badge bg-success";
+                                }
+                                v_list = "<td>" + v1 + "</td><td>" + v2 + "</td><td>" + v3 + "</td>"
+                                $('.tb-list').append(
+                                    "<tr req-cand-id=" + Data[i].req_cand_id + " cv-id="+Data[i].cv_id+">" +
+                                    "<td><button type='button' title='Edit' name='btn-cand' class='btn btn-primary btn-cand'><i class='fas fa-edit'></i></button></td>" +
+                                    "<td>" + (i + 1) + "</td>" +
+                                    "<td><a href='@Url.Action("Detail", "Candidate")?cand_id=" + Data[i].cand_id + "' target='_blank'>" + Data[i].cand_name + "</a></td>" +
+                                    "<td>" + Data[i].sent_date +
+                                    //"<div class='form-group text-center' style='margin:auto;'>" +
+                                    //"<div class='custom-control custom-checkbox'>" +
+                                    //"<input class='custom-control-input' type='checkbox' id='cb" + i + "' disabled>" +
+                                    //"<label for='cb" + i + "' class='custom-control-label'></label>" +
+                                    //"</div>" +
+                                    //"</div>" +
+                                    "</td> " +
+                                    "<td>" + Data[i].cv_return +
+                                    "</td> " +
+                                    v_list +
+                                    "<td class='text-center'><span title='"+Data[i].create_status+"' data-toggle='tooltip' class='" + badge + "' style='cursor: pointer;'>" + Data[i].status + "</span></td>" +
+                                    "<td>" + Data[i].remark_status + "</td>" +
+                                    "</tr>"
+                                );
+
+                                $('[data-toggle="tooltip"]').tooltip();
+                                if (Data[i].sent_date != "") {
+                                    count_send++
+                                    // $("#cb" + i + "").prop("checked", true);
+                                }
+                                $('.search-cand option[value=' + Data[i].cand_id + ']').prop("disabled", true);
+                            }
+                            $('.count-send').html("");
+                            $('.count-send').append("(" + count_send + ")");
+                            $('.search-cand').selectpicker('refresh');
+                        }
+                        else {
+                            cv_id = Data[0].cv_id;
+                            $('.cand-status').html("");
+                            $('.status-enddate').val('');
+                            $('.remark-status').val('');
+                            $('.remark-status').val(Data[0].remark_status);
+                            $('.search-cand').selectpicker('val', Data[0].cand_id);
+                            $('#btn-del-cv').prop('disabled', false);
+                            if (Data[0].status != "") {
+                                $('.cand-status').append(Data[0].status).addClass("badge bg-success");
+                                $('#btn-del-cv').prop('disabled', true);
+                            }
+                            $('.status-enddate').val(Data[0].enddate);
+                            $('.sent_date').datepicker('setDate', Data[0].sent_date);
+                            $('.cv_return').datepicker('setDate', Data[0].cv_return);
+                            //$("#cb").prop("checked", Data[0].send);
+                            $('.pdf-title').html("");
+                            $('.pdf-title').append(Data[0].cand_name);
+                            cv_path = Data[0].cv_path;
+
+                            for (var i = 0; i < Data.length; i++) {
+                                var new_inter = 0;
+                                if (i == 0) {
+                                    new_inter = 1;
+                                    $('[box-inter=' + new_inter + ']').attr("interview-id", Data[i].interview_id);
+                                    $('[box-inter=' + new_inter + ']').find('textarea.remark').val(Data[i].remark);
+                                    $('[box-inter=' + new_inter + '] input.datepicker').datepicker('setDate', Data[i].interview_date);
+                                    $('[box-inter=' + new_inter + ']').find('textarea').addClass('box-size');
+                                    $('.first-box').nextAll('div.first-box').remove();
+
+                                    $('#btn-inter-box').prop('disabled', false);
+                                }
+                                else {
+                                    var count_inter = $('#btn-inter-box').prev().find('.box-inter').attr('box-inter');
+
+                                    if (count_inter < 3) {
+
+                                        $('#btn-inter-box').before($('#btn-inter-box').prev().clone());
+
+                                        new_inter = parseInt(count_inter) + 1;
+                                        $('div[box-inter=' + new_inter + '] :input').val('');
+
+                                        $('#btn-inter-box').prev().find('.count-inter').html("");
+                                        $('#btn-inter-box').prev().find('.box-inter').attr('box-inter', new_inter);
+
+                                        $('#btn-inter-box').prev().find('.count-inter').append(new_inter);
+
+                                        $('div[box-inter=' + new_inter + ']').find('button[name="box-inter-del"]').prop("disabled", false);
+
+                                        $('[box-inter=' + new_inter + ']').attr("interview-id", Data[i].interview_id);
+                                        $('[box-inter=' + new_inter + ']').find('textarea.remark').val(Data[i].remark);
+                                        $('[box-inter=' + new_inter + ']').find('input.datepicker').datepicker(format_date).datepicker('setDate', Data[i].interview_date);
+                                        $('[box-inter=' + new_inter + ']').find('textarea').addClass('box-size');
+                                        $('[box-inter=' + new_inter + ']').find('textarea').attr('name', 'remark' + new_inter);
+                                        var x = Data[i].interview_date;
+                                        if (new_inter == 3) {
+                                            $('#btn-inter-box').prop('disabled', true);
+                                        }
+                                    }
+                                }
+                                var arr_cont_id = [];
+                                for (var j = 0; j < Data[i].interviews.length; j++) {
+                                    arr_cont_id.push(Data[i].interviews[j].cont_id);
+                                }
+                                $('[box-inter="' + new_inter + '"] .cont-list').selectpicker('val', arr_cont_id);
+                                $('[box-inter="' + new_inter + '"] .cont-list').selectpicker('refresh');
+                                if (new_inter > 1) {
+                                    $('[box-inter=' + new_inter + '] .cont-list').find('button').last().remove();
+                                }
+
+                            }
+                            autoheight();
+                        }
+
+                        GetSucc();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function CvDet() {
+                var cand_id = candidate_id;
+                return {
+                    cand_id: cand_id, req_id: req_id
+                }
+            }
+            function UpdateCand() {
+                var det = CvDet();
+                $.ajax({
+                    url: '@Url.Action("InsertCandOfReq","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: det,
+                    success: function (Data) {
+                        window.location.reload();
+                        //$('#addCvModal').modal('hide');
+                        //req_cand_id = 0;
+                        //GetCV();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function InterviewDet() {
+                arr_intview = [];
+                $('[class*=box-inter]').each(function (i, e) {
+                    var x = $(this).find('.cont-list').val();
+                    arr_intviewer = [];
+                    $(this).find('.cont-list option:selected').each(function (i, e) {
+                        if (x != undefined) {
+                            if ($(this).val() != "") {
+                                arr_intviewer.push({
+                                    item_id: $(this).attr('item-id'),
+                                    cont_id: $(this).val(),
+                                });
+                            }
+                        }
+                    });
+                    if ($(this).find('.datepicker').val() != "") {
+                        arr_intview.push({
+                            req_cand_id: req_cand_id,
+                            interview_remark: $(this).find('.remark').val(),
+                            interview_date: $(this).find('.datepicker').val(),
+                            interview_id: $(this).attr('interview-id'),
+                            interviews: arr_intviewer
+                        });
+                    }
+
+                })
+                var sent_date = $('.sent_date').val();
+                var cv_return = $('.cv_return').val();
+                var rm_status = $('.remark-status').val();
+                var postData = JSON.stringify({ data: arr_intview, sent_date: sent_date, cv_return: cv_return, remark_status: rm_status, req_cand_id: req_cand_id });
+                return postData;
+            }
+            function UpdateInterviewOfCand() {
+                var det = InterviewDet();
+                $.ajax({
+                    url: '@Url.Action("UpdateInterview","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    contentType: "application/json; charset=utf-8",
+                    data: det,
+                    success: function (Data) {
+                        $('#addCvModal').modal('hide');
+                        req_cand_id = 0;
+                        GetCV();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function GetSucc() {
+                $.ajax({
+                    url: '@Url.Action("GetReqSucc","Requisition")',
+                    type: 'GET',
+                    dataType: 'json',
+                    cache: false,
+                    data: { req_id: "@ViewBag.ReqID" },
+                    success: function (Data) {
+                        //$('.enddate').val(Data[0].enddate);
+                        //$('.dur-date').html("");
+                        //$('.dur-date').append("(" + calDateDel(Data[0].s_date, Data[0].enddate) + " days)");
+                        $('.tb-list-selected').html("");
+                        $('.cand-succ option').prop("disabled", false);
+                        for (var i = 0; i < Data.length; i++) {
+                            var base64num = btoa(Data[i].cv_id);
+                            var encodeuri = encodeURIComponent(base64num);
+                            $('.tb-list-selected').append(
+                                "<tr succ-id=" + Data[i].succ_id + " cand-name='" + Data[i].cand_name + "' req-cand-id='" + Data[i].req_cand_id + "' emp-id='" + Data[i].emp_id + "' position-name='" + Data[i].position + "'>" +
+                                "<td>" + (i + 1) + "</td>" +
+                                "<td>" + Data[i].cand_name + "</td>" +
+                                "<td><input type='text' class='form-control-sm emp_id' style='width: 60%;' value=" + Data[i].emp_id + "></td>" +
+                                "<td><input class='datepicker form-control-sm s_work_date' style='width: 60%;' value=" + Data[i].s_work_date + "></td>" +
+                                //"<td style='border: 1px solid #ffffff;'><button class='btn btn-danger' style='padding: 0px 8px 0px 8px;' name='del-select-cand'><i class='fas fa-trash'></i></button><button type='button' class='btn btn-info' name='prps-det' style='margin-left: 2%;padding: 0px 8px 0px 8px;'><i class='fas fa-file-alt'></i></button></td>" +
+                                "<td style='border: 1px solid #ffffff;'><button class='btn btn-danger' style='padding: 0px 8px 0px 8px;' name='del-select-cand'><i class='fas fa-trash'></i></button><button type='button' class='btn btn-info' name='prps-det' style='margin-left: 2%;padding: 0px 8px 0px 8px;'><i class='fas fa-file-alt'></i></button><a href='@Url.Action("OpenCvFile", "Candidate")?cv_id=" + encodeuri + "' target='_blank' class='btn btn-info' title='CV' name='view-cv' style='margin-left: 2%;padding: 0px 5px 0px 5px;' ><i class='fas fa-eye'></i></a></td>" +
+                                "</tr>"
+                            );
+
+                            $('.cand-succ option[value=' + Data[i].cand_id + ']').prop("disabled", true);
+                        }
+                        if (Data.length == 0) {
+                            $('.tb-list-selected').append("<tr><td colspan='4' style='text-align: center;'>Data not found</td></tr>")
+                        }
+                        else {
+                            var n = calDateDel(s_date, Data[0].create_date);
+                            var dur = parseInt(n) + 1;
+                            if (s_date != undefined || s_date != "") {
+                                $('.dur-date').html("");
+                                $('.dur-date').append("Duration : " + dur + " days");
+                            }
+
+                        }
+                        $('.cand-succ').selectpicker('refresh');
+                        autoheight();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function DetSucc() {
+                var cand_id = $('.cand-succ option:selected').val();
+                var emp_id = $('.emp_id').val();
+                var req_cand_id = $('.cand-succ option:selected').attr('req-cand-id');
+                var enddate = $('.enddate').val();
+                return { req_id: "@ViewBag.ReqID", cand_id: cand_id, emp_id: emp_id, req_cand_id: req_cand_id, enddate: enddate, succ_id: succ_id, s_work_date: s_work_date, type: type_succ }
+            }
+            function UpdateSucc() {
+                var det = DetSucc();
+                $.ajax({
+                    url: '@Url.Action("UpdateSucc","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: det,
+                    success: function () {
+                        $('#confirmDelModal').modal('hide');
+                        $('#selCandModal').modal('hide');
+                        swalDefaultSuccess();
+                        window.location.reload();
+                        //req_cand_id = 0;
+                        //GetCV();
+                        //GetSucc();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function DelCand() {
+                $.ajax({
+                    url: '@Url.Action("DelCand","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: { req_cand_id: req_cand_id },
+                    success: function () {
+                        $('#confirmDelModal').modal('hide');
+                        $('#addCvModal').modal('hide');
+                        swalDefaultSuccess();
+                        window.location.reload();
+                        //req_cand_id = 0;
+                        //GetCV();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function Detail() {
+                var hc = $('.headcounter').val();
+                var s_date = $('.create-succ').val();
+                var remark = $('.remark').val();
+                var req_no = $('.req_no').val();
+                var title = $('.req_title').val();
+                var position = $('.selete2-posi').val();
+                //if (position == 0) {
+                //    position = $('.selete2-posi').val();
+                //}
+
+                var client_id = $('.client-id option:selected').val();
+                var st = "Close";
+                if ($('#status').prop("checked")) {
+                    st = "Open";
+                }
+                return {
+                    req_id: "@ViewBag.ReqID", headcounter: hc, req_status: st, s_date: s_date, remark: remark, type: "update", req_no: req_no, title: title, position_id: position, client_id: client_id
+                }
+            }
+            function UpdateDef() {
+                var det = Detail();
+                $.ajax({
+                    url: '@Url.Action("Update","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: det,
+                    success: function (Data) {
+                        swalDefaultSuccess();
+                        window.location.reload();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function CreatePosition(posi_name) {
+                $.ajax({
+                    url: '@Url.Action("CreatePosition","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    cache: false,
+                    data: { posi_name: posi_name },
+                    success: function (Data) {
+                        position_id = Data;
+                        UpdateDef();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function RefreshPps() {
+                $('.start_date').val('');
+                $('.end_date').val('');
+                $('.working_date').val(5);
+                $('.proposal_date').val('');
+                $('.scope_service').val('');
+                $('.act_salary').val('');
+                $('.period').val('');
+            }
+            function DetPps() {
+                var start_date = $('.start_date').val();
+                var end_date = $('.end_date').val();
+                var working_date = $('.working_date').val();
+                var proposal_date = $('.proposal_date').val();
+                var scope_service = $('.scope_service').val();
+                var act_salary = $('.act_salary').val();
+                var period = $('.period').val();
+                var pps_comp = $('.pps_comp').val();
+                var pps_license = $('.pps_license').val();
+                return {
+                    succ_id: succ_id, start_date: start_date, end_date: end_date, working_date: working_date,
+                    proposal_date: proposal_date, scope_service: scope_service, act_salary: act_salary, period: period, position: position_name, pps_comp: pps_comp, pps_license: pps_license
+                }
+            }
+            function UpdatePps() {
+                det = DetPps();
+                $.ajax({
+                    url: '@Url.Action("UpdateProposal","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: det,
+                    success: function () {
+                        swalDefaultSuccess();
+                        RefreshPps();
+                        GetPps();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function GetPps() {
+                $.ajax({
+                    url: '@Url.Action("GetProposalBySuccID","Requisition")',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: { succ_id: succ_id },
+                    success: function (Data) {
+                        $('.pps-list').html("");
+                        for (var i = 0; i < Data.length; i++) {
+                            $('.pps-list').append('<li>' +
+                                '<a>' +
+                                '<span class="text-green">' + Data[i].file_name + '  </span>' +
+                                '<span class="text-gray" style="font-size: 13px;"><i class="fas fa-file-upload"></i> create by : ' + Data[i].create_by + '</span>' +
+                                '<div class="tools" pps-id="' + Data[i].proposal_id + '" name="download-pps">' +
+                                '<i class="fas fa-file-download"></i>' +
+                                '</div>' +
+                                '</a>' +
+                                '</li>');
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+            function DelReq() {
+                $.ajax({
+                    url: '@Url.Action("DelReqByReqID","Requisition")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: { req_id: req_id },
+                    success: function () {
+                        window.location.href = "@Url.Action("Index","Requisition")";
+                    }
+                });
+            }
+
+            //------------------------------btn--------------------------------//
+          /*  var parent = $('embed.file_name').parent();*/
+            $('.btn-pdf-view').on('click', function () {
+                //$('embed.file_name').remove();
+                @*var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenReqFile","Requisition")?req_id=' + req_id);
+                parent.append(new_item);
+                $('.pdf-title').html("");
+                $('.pdf-title').append(req_no);
+                $('#pdfModal').modal();*@
+                var base64num = btoa(req_id);
+                var encodeuri = encodeURIComponent(base64num);
+                window.open("@Url.Action("OpenReqFile","Requisition")?req_id=" + encodeuri);
+            });
+            $('#btn-cv-view').on('click', function () {
+                //$('embed.file_name').remove();
+                @*var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenCvFile","Candidate")?cv_id=' + cv_id);
+                parent.append(new_item);
+                $('#pdfModal').modal();*@
+                var base64num = btoa(cv_id);
+                var encodeuri = encodeURIComponent(base64num);
+                window.open("@Url.Action("OpenCvFile", "Candidate")?cv_id=" + encodeuri);
+            });
+
+            $('#btn-add-cv').on('click', function () {
+                $('.search-cand').prop('disabled', false);
+                $('.search-cand').val('');
+                $('.search-cand').selectpicker('refresh');
+                $('.cand-add').css("display", "none");
+                type_cand = "insert"
+                $('.cand-det').css("display", "none");
+                $('#btn-del-cv').css("display", "none");
+
+                //$('.modal-cv-size').removeClass("modal-xl");
+                //$('.modal-cv-size').addClass("modal-lg");
+                $('.cv-title').html("");
+                $('.cv-title').append("<i class='fas fa-address-book text-success'></i> Add Candidate");
+                $('#addCvModal').modal();
+            });
+            $('#btn-save-cv').on('click', function () {
+                if (type_cand == "insert") {
+                    UpdateCand();
+                }
+                else if (type_cand == "update") {
+                    UpdateInterviewOfCand();
+                }
+
+            });
+            $('.tb-list').on('click', '[name="btn-cand"]', function () {
+                $('.search-cand').prop('disabled', true);
+                $('.search-cand').selectpicker('refresh');
+                type_cand = "update";
+                req_cand_id = $(this).closest('tr').attr('req-cand-id');
+                cv_id = $(this).closest('tr').attr('cv-id');
+                GetCV();
+
+                $('#btn-del-cv').css("display", "block");
+                $('.cand-det').css("display", "block");
+                $('.cand-add').css("display", "none");
+                $('.cv-title').html("");
+                $('.cv-title').append("<i class='fas fa-address-book text-success'></i> Candidate Detail");
+                $('#addCvModal').modal();
+            });
+
+            $(document).on('click', '[name="intwer-del"]', function (e) {
+                $(this).closest('div').remove();
+            });
+            $('#btn-inter-box').on('click', function () {
+                var count_inter = $(this).prev().find('.box-inter').attr('box-inter');
+                var new_inter = 0;
+                if (count_inter < 3) {
+
+                    $(this).before($(this).prev().clone());
+
+                    new_inter = parseInt(count_inter) + 1;
+                    $(this).prev().find('.box-inter').attr('box-inter', new_inter);
+
+                    $(this).prev().find('.count-inter').html("");
+                    $(this).prev().find('.count-inter').append(new_inter);
+                    $('[box-inter=' + new_inter + ']').attr("interview-id", 0);
+                    $('[box-inter=' + new_inter + '] input').attr("item-id", 0);
+                    $('div[box-inter=' + new_inter + '] :input').val('');
+                    $('[box-inter=' + new_inter + ']').find('textarea').addClass('box-size');
+                    $('div[box-inter=' + new_inter + ']').find('button[name="box-inter-del"]').prop("disabled", false);
+                    $('[box-inter=' + new_inter + ']').find('textarea').attr('name', 'remark' + new_inter);
+                    $('[box-inter=' + new_inter + ']').find('.cont-list').selectpicker('val', '');
+                    $('[box-inter=' + new_inter + '] .cont-list').find('button').last().remove();
+
+                    if (new_inter == 3) {
+                        $(this).prop('disabled', true);
+                    }
+                }
+            });
+            $(document).on('click', 'button[name="box-inter-del"]', function () {
+                var count_inter = $(this).closest('.box-inter').attr('box-inter');
+                $(this).closest('.cand-det').remove();
+
+                if (count_inter == 2) {
+                    if ($('div[box-inter="3"')) {
+                        $('div[box-inter="3"]').attr('box-inter', 2).find('span.count-inter').html("");
+                        $('div[box-inter="2"]').find('span.count-inter').append(2);
+                    }
+                }
+                $('#btn-inter-box').prop('disabled', false);
+            });
+            $('.btn-select-cand').on('click', function () {
+                if ($('#formValidate').valid()) {
+                    $('.cand-succ').val('');
+                    $('.cand-succ').selectpicker('refresh');
+                    $('.cand-title').html("");
+                    $('.cand-title').append("<i class='fas fa-user-check text-success'></i> Select Candidate");
+                    $('#selCandModal').modal();
+                }
+            });
+            $('#btn-save-select-cand').on('click', function () {
+                type_succ = "insert";
+                if ($('#formValidateSucc').valid()) {
+                    UpdateSucc();
+                }
+            });
+            $('.tb-list-selected').on('click', '[name="del-select-cand"]', function (e) {
+                succ_id = $(this).closest('tr').attr('succ-id');
+                req_cand_id = $(this).closest('tr').attr('req-cand-id');
+                $('.cand-succ option:selected').attr('req-cand-id', req_cand_id);
+                $('.cand-name').html("");
+                $('.cand-name').append($(this).closest('tr').attr('cand-name'));
+                conf_del = "bysucc";
+                $('#confirmDelModal').modal();
+                e.preventDefault();
+            });
+            $('#btn-conf-del-cand').on('click', function () {
+                type_succ = "delete";
+                if (conf_del == "byreq") {
+                    DelCand();
+                }
+                else if (conf_del = "bysucc") {
+                    UpdateSucc();
+                }
+            });
+            $('#btn-del-cv').on('click', function () {
+                var c_name = $('option:selected', '.search-cand').attr('cname');
+                $('.cand-name').html("");
+                $('.cand-name').append(c_name);
+                conf_del = "byreq";
+                $('#confirmDelModal').modal();
+            });
+            $('#btn-save').on('click', function () {
+
+                //var position = $('.selete2-posi').val();
+                //if (position == new_position) {
+                //    CreatePosition(position);
+                //}
+                //else {
+                    if ($('#formValidate').valid()) {
+                        UpdateDef();
+                    }
+                //}
+
+            });
+            $(document).on('click', '[name="prps-det"]', function () {
+                succ_id = $(this).closest('tr').attr('succ-id');
+                var cand_name = $(this).closest('tr').attr('cand-name');
+                position_name = $(this).closest('tr').attr('position-name');
+                GetPps();
+                $('.prps-title').html("");
+                $('.prps-title').append(cand_name);
+                $('#proposalModal').modal();
+            });
+            $('#btn-save-pps').on('click', function () {
+                if ($('#formValidatePps').valid()) {
+                    UpdatePps();
+                }
+            });
+            $(document).on('click', '[name="download-pps"]', function () {
+                var pps_id = $(this).attr('pps-id');
+                window.location.href = '@Url.Action("DownloadProposal","Requisition")?proposal_id=' + pps_id;
+               });
+
+            $('#btn-del').on('click', function () {
+                $('.req-no').html("");
+                $('.req-no').append(req_no);
+                $('#confirmDelReqModal').modal();
+            });
+
+            $('#btn-conf-del-req').on('click', function () {
+                DelReq();
+            });
+            $('#upload-req-file').on('click', function () {
+                $('#uploadFileModal').modal();
+            });
+            $('#btn-save-upload-req').on('click', function () {
+                if ($('#formValidateUploadFile').valid()) {
+                    UploadFile();
+                }
+            });
+
+            //------------------------------change--------------------------------//
+            $('.search-cand').on('change', function () {
+                candidate_id = $('option:selected', this).val();
+                var gender = $('option:selected', this).attr('gender');
+                var mail = $('option:selected', this).attr('mail');
+                var mobile = $('option:selected', this).attr('mobile');
+                //var cv_path = $('option:selected', this).attr('cv-path');
+                cv_id = $('option:selected', this).attr('cv-id');
+                var exp_salary = $('option:selected', this).attr('exp-salary');
+                var apply_date = $('option:selected', this).attr('apply-date');
+                var g = "<i class='fas fa-male'></i> ";
+                if (gender == "Female") {
+                    g = "<i class='fas fa-female'></i> ";
+                }
+
+                $('.cand-add').css("display", "block");
+                $('.g-icon').html("");
+                $('.gender').html("");
+                $('.mail').html("");
+                $('.mobile').html("");
+                $('.exp_salary').html("");
+                $('.apply_date').html("");
+
+                $('.g-icon').append(g);
+                $('.gender').append(gender);
+                $('.mail').append(mail);
+                $('.mobile').append(mobile);
+                $('.exp_salary').append(exp_salary);
+                $('.apply_date').append(apply_date);
+                var parent_precv = $('embed.pre_cv').parent();
+                //$('embed.pre_cv').remove();
+                var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenCvFile","Candidate")?cv_id=' + cv_id);
+                parent_precv.append(new_item);
+            });
+            $('.create-succ').on('change', function () {
+                UpdateDef();
+                var s_date = $(this).val();
+                var close_date = $('.close_date').val();
+                if (s_date != undefined && close_date != undefined) {
+                    $('.dur-date').html("");
+                    $('.dur-date').append("Duration : " + calDateDel(s_date, close_date) + " days");
+                }
+            });
+            $(document).on('change', '.s_work_date', function () {
+                type_succ = "update";
+                s_work_date = $(this).val();
+                succ_id = $(this).closest('tr').attr('succ-id');
+                req_cand_id = $(this).closest('tr').attr('req-cand-id');
+                UpdateSucc();
+            });
+            $(document).on('focusout', '.emp_id', function () {
+                type_succ = "updateempid";
+                succ_id = $(this).closest('tr').attr('succ-id');
+                $('.emp_id').val($(this).val());
+                UpdateSucc();
+            });
+            $('.client-id').on('change', function () {
+                var adrs = $('option:selected', this).attr("clent-adrs");
+                var tel = $('option:selected', this).attr("clent-tel");
+                $('.clent-det').css("display", "block");
+
+                $('.clent-adrs').html("");
+                $('.clent-tel').html("");
+
+                $('.clent-adrs').append(adrs);
+                $('.clent-tel').append(tel);
+            });
+            //------------------------------datepicker-----------------------------------//
+            $(document).on('focus', '.datepicker', function () {
+                $(this).datepicker(format_date);
+            });
+            //---------------------alert--------------------------//
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            function swalDefaultSuccess() {
+                Toast.fire({
+                    type: 'success',
+                    title: 'Update successfully'
+                })
+            }
+            //------------------------cal-date----------------------------//
+            function calDateDel(s_date, f_date) {
+                var f = s_date;
+                var r = f_date;
+                var fdate = f.split("/").reverse().join(",");
+                var rdate = r.split("/").reverse().join(",");
+                if (navigator.userAgent.indexOf('MSIE') !== -1
+                    || navigator.appVersion.indexOf('Trident/') > -1) {
+
+                    fdate = ConvertDate(f);
+                    rdate = ConvertDate(r);
+                    fdate = fdate + "T00:00:00.000Z";
+                    rdate = rdate + "T00:00:00.000Z";
+                }
+                f = new Date(fdate);
+                r = new Date(rdate);
+
+                if (f <= r && f != "" && r != "") {
+                    var totalDays = Math.round((r - f) / 8.64e7);
+                    var wholeWeeks = totalDays / 7 | 0;
+                    var days = wholeWeeks * 5;
+                    if (totalDays % 7) {
+                        f.setDate(f.getDate() + wholeWeeks * 7);
+
+                        while (f < r) {
+                            f.setDate(f.getDate() + 1);
+                            if (f.getDay() != 0 && f.getDay() != 6) {
+                                ++days;
+                            }
+                        }
+                    }
+                    return days;
+                }
+
+            }
+            function ConvertDate(date) {
+                var date = date.split("-");
+                var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                for (var j = 0; j < months.length; j++) {
+                    if (date[1] == months[j]) {
+                        date[1] = months.indexOf(months[j]) + 1;
+                    }
+                }
+                if (date[1] < 10) {
+                    date[1] = '0' + date[1];
+                }
+                return date[2] + '-' + date[1] + '-' + date[0];
+            }
+            //------------------------textarea----------------------------//
+            $(document).on('keyup', '.box-size', function (e) {
+                autoheight(this);
+            });
+
+            function autoheight() {
+                $('[class*="box-size"]').each(function () {
+                    var a = this;
+                    if (!$(a).prop('scrollTop')) {
+                        do {
+                            var b = $(a).prop('scrollHeight');
+                            var h = $(a).height();
+                            $(a).height(h - 5);
+                        }
+                        while (b && (b != $(a).prop('scrollHeight')));
+                    };
+                    $(a).height($(a).prop('scrollHeight') + 20);
+                })
+            }
+              //----------------------upload-file--------------------------//
+        var formdata; //FormData object
+
+        $("#fileInput").on("change", function () {
+            formdata = new FormData();
+            $("#FilesList tbody").html("");
+            file = $('#fileInput')[0].files;
+            ValidateSize(file);
+            var fileInput = document.getElementById('fileInput');
+                var sfilename = fileInput.files[0].name;
+                formdata.append(sfilename, fileInput.files[0]);
+        });
+        function ValidateSize(file) {
+            var FileSize = file[0].size / 1024 / 1024; // in MB
+            if (FileSize > 150) {
+                $('#fileInput').val('');
+                alert('File size exceeds 150 MB');
+            }
+        }
+            function UploadFile() {
+                $("#loader").css("display", "block");
+            $('#fileInput').val('');
+            var req_no = $('.req_no').val();
+            formdata.append('req_id', req_id);
+            formdata.append('req_no', req_no);
+            $.ajax({
+                url: '@Url.Action("SaveFileStream", "Requisition")',
+                type: "POST",
+                contentType: false,
+                processData: false,
+                cache: false,
+                data: formdata,
+                async: false,
+                success: function (result) {
+                    if (result != "") {
+                      /*  setTimeout(function () {*/
+                            swalDefaultSuccess();
+
+                       /* }, 2000);*/
+                    }
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                },
+                complete: function () {
+                    $('#uploadFileModal').modal('hide');
+                    $("#loader").css("display", "none");
+                  /*  location.reload();*/
+                }
+            });
+        }
+        });
+</script>
+

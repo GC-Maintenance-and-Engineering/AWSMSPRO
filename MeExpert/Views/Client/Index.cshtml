@@ -1,0 +1,692 @@
+﻿
+@{
+    ViewBag.Title = "Client";
+}
+<style>
+    .fixedHeightContainer {
+        float: right;
+        height: 134px;
+        padding: 11px;
+    }
+
+    .content-req-list {
+        height: 135px;
+        overflow: auto;
+        background: #fff;
+    }
+    .font-collap{
+        color: gray !important;
+        font-weight: 500;
+        padding: 0px;
+    }
+    .font-collap:hover {
+        color: #0056b3 !important;
+    }
+    .fixed-height-srvagr{
+        float: right;
+        height: 250px;
+        width: 100%;
+        margin-top: 0.57rem;
+    }
+</style>
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <button type="button" class="btn btn-success" id="btn-modal"><i class="fas fa-plus"></i> New Client</button>
+        </div>
+        <div class="card-body">
+            <table id="tb-list-page" class="table table-sm table-striped table-bordered" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th style="width:1%">No.</th>
+                        <th style="width:28%">Client Name</th>
+                        <th style="width:28%">Address</th>
+                        <th style="width:10%">Contact No.</th>
+                        <th style="width:28%">Latest Comment</th>
+                    </tr>
+                </thead>
+                <tbody class="tb-list">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" style="margin-top: 5px; margin-bottom: 5px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formValidate" class="formValidate">
+                    <div class="col-8">
+                        <div class="form-group">
+                            <label>Client Name</label>
+                            <input class="form-control form-control-sm client_name" type="text" name="nclentname" />
+                        </div>
+                    </div>
+                    <div class="col-12 row">
+                        <div class="col-8">
+                            <div class="form-group">
+                                <label>Address</label>
+                                <textarea class="form-control client_address" style="height: 64px;" name="nadds"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <label>Tel.</label>
+                                <input class="form-control form-control-sm client_tel" name="" type="text" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 row">
+                        <div class="col-4">
+                            <label>Contact Person</label>
+                        </div>
+                        <div class="col-4">
+                            <label>Position</label>
+                        </div>
+                        <div class="col-3">
+                            <label>Mobile</label>
+                        </div>
+                    </div>
+                    <div class="col-12 row cont-list">
+                        <div class="col-4">
+                            <div class="form-group">
+                                <input class="form-control form-control-sm cont_person" name="npersonname" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-group">
+                                <input class="form-control form-control-sm cont_pos" name="" type="text" />
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="form-group">
+                                <input class="form-control form-control-sm cont_mobile" name="nmobile" type="text" />
+                            </div>
+                        </div>
+                        <button class="btn btn-danger" type="button" name="del-cont" style=" position: absolute; right: 0px;margin-right: 18px;" title="delete" disabled><i class="fas fa-trash"></i></button>
+                    </div>
+                    <button id="btn-add-cont" class="btn btn-secondary" type="button" style="float:right;margin-right: 23px;">Add</button>
+                    <div class="col-12 row">
+                        <div class="col-10">
+                            <label>Comment</label>
+                        </div>
+                    </div>
+                    <div class="col-12 row remark-list">
+                        <div class="col-9">
+                            <div class="form-group">
+                                <textarea class="form-control remark box-size" style="height: 64px;" name="nrem"></textarea>
+                            </div>
+                        </div>
+                        <div class="col-2">
+                            <p class="create_remark_by" style="font-size: 12px;"></p>
+                        </div>
+                        <button class="btn btn-danger" type="button" name="del-remark" style=" position: absolute; right: 0px;margin-right: 18px;" title="delete" disabled><i class="fas fa-trash"></i></button>
+                    </div>
+                    <button id="btn-add-remark" class="btn btn-secondary" type="button" style="float:right;margin-right: 23px;">Add</button>
+                    @*<div class="card card-req" style=" margin-top: 55px;">
+                        <div class="card-body fixedHeightContainer" style="font-size: 13px;">
+                            <h6 class="text-gray">Requsition</h6>
+                            <div class="content-req-list">
+                                <ul class="todo-list ui-sortable req-list" data-widget="todo-list">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>*@
+                    <div id="accordion" class="card-req" style=" margin-top: 55px;">
+                        <div class="card">
+                            <div class="card-header" id="reqHeading">
+                                <h6 class="mb-0">
+                                    <a class="btn btn-link font-collap" data-toggle="collapse" data-target="#reqColl" aria-expanded="true" aria-controls="collapseOne">
+                                        Requsition
+                                    </a>
+                                </h6>
+                            </div>
+                            <div id="reqColl" class="collapse show" aria-labelledby="reqHeading" data-parent="#accordion">
+                                <div class="card-body">
+                                    <div class="content-req-list">
+                                        <ul class="todo-list ui-sortable req-list" data-widget="todo-list">
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="srvHeading">
+                                <h6 class="mb-0">
+                                    <a class="btn btn-link font-collap" data-toggle="collapse" data-target="#srvColl" aria-expanded="false" aria-controls="collapseOne">
+                                        Service Agreement
+                                    </a>
+                                </h6>
+                            </div>
+                            <div id="srvColl" class="collapse" aria-labelledby="srvHeading" data-parent="#accordion">
+                                <div class="card-body">
+                                    <div class="row">
+                                            <div class="col-7 select-file"></div>
+                                            <div class="col-7 p-2">
+                                                <input class="form-control form-control-sm srv_file_name" placeholder="File Name" type="text" />
+                                                <div id="srv_file_name-error" style="display:none" class="error">This field is required.</div>
+                                            </div>
+                                            <div class="col-6">
+                                                <a class="btn btn-success btn-upload-file" style="color: #fff;">
+                                                    Upload File
+                                                </a>
+                                            </div>
+                                    </div>
+                                    <ul class="todo-list ui-sortable srv-list fixed-height-srvagr" data-widget="todo-list">
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger float-left" id="btn-del">Delete Client</button>
+                <button type="button" class="btn btn-success" id="btn-save"></button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="confirmDelModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <span><i class="fas fa-exclamation-circle text-warning" style="font-size:60px;"></i></span>
+                <h4>Are you sure want to delete <span class="client-name"></span></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btn-conf-del">Delete</button>
+                <button type="button" class="btn btn-danger" id="btn-conf-del-srv-file">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="clientModal" style="z-index: 9999;">
+    <div class="modal-dialog modal-lg" role="document" style="max-width: 835px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title srv-file-name"></h6>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <embed class="file_name" width="800px" height="400px" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(document).ajaxStart(function () {
+            $("#loader").css("display", "block");
+        });
+        $(document).ajaxComplete(function () {
+            $("#loader").css("display", "none");
+        });
+        var client_id = 0;
+        var type = "";
+        var client_name = "";
+        var arr_cont = [];
+        var arr_remark = [];
+        var srv_id = 0;
+        Get();
+
+        function Get() {
+            $.ajax({
+                url: '@Url.Action("Get","Client")',
+                type: 'GET',
+                dataType: 'json',
+                cache: false,
+                data: { client_id: client_id },
+                success: function (Data) {
+                    if (client_id == 0) {
+                        $('.tb-list').html("");
+                        $('#tb-list-page').DataTable().clear().destroy();
+                        for (var i = 0; i < Data.length; i++) {
+                            $('.tb-list').append(
+                                "<tr client-id=" + Data[i].client_id + " client-name='" + Data[i].client_name + "' style='cursor: pointer;'>" +
+                                "<td>" + Data[i].no + "</td>" +
+                                "<td>" + Data[i].client_name + "</td>" +
+                                "<td>" + Data[i].client_address + "</td>" +
+                                "<td>" + Data[i].client_tel + "</td>" +
+                                "<td>" + Data[i].remark + "<br/><span style='font-size:12px'>" + Data[i].create_by + "</span></td>" +
+                                "</tr>"
+                            );
+                        }
+                        $('#tb-list-page').DataTable();
+                        $('.dataTables_length').addClass('bs-select');
+                    }
+                    else {
+
+                        $('.client_name').val('');
+                        $('.client_address').val('');
+                        $('.client_tel').val('');
+                        $('.remark').val('');
+                        $('.create_remark_by').html("");
+
+                        $('.client_name').val(Data[0].client_name);
+                        $('.client_address').val(Data[0].client_address);
+                        $('.client_tel').val(Data[0].client_tel);
+                        $('.remark').val(Data[0].remark);
+
+                        $('.cont-list').removeAttr("cont-id"),
+                            $('.cont_person').val('');
+                        $('.cont_mobile').val('');
+                        $('.cont_pos').val('');
+
+
+                        for (var j = 0; j < Data[0].arr_data.length; j++) {
+                            if (j == 0) {
+
+                                $('.cont-list').nextAll('.cont-list').remove();
+                                $('.cont-list').attr("cont-id", Data[0].arr_data[j].cont_id);
+                                $('.cont_person').val(Data[0].arr_data[j].cont_person_name);
+                                $('.cont_mobile').val(Data[0].arr_data[j].cont_person_mobile);
+                                $('.cont_pos').val(Data[0].arr_data[j].cont_pos);
+                            }
+                            else {
+                                $('#btn-add-cont').before($('#btn-add-cont').prev().clone());
+                                $('#btn-add-cont').prev().find('.cont_person').val(Data[0].arr_data[j].cont_person_name);
+                                $('#btn-add-cont').prev().find('.cont_pos').val(Data[0].arr_data[j].cont_pos);
+                                $('#btn-add-cont').prev().find('.cont_mobile').val(Data[0].arr_data[j].cont_person_mobile);
+                                $('#btn-add-cont').prev().find('[name="del-cont"]').prop('disabled', false);
+                                $('#btn-add-cont').prev('.cont-list').removeAttr("cont-id");
+                                $('#btn-add-cont').prev('.cont-list').attr("cont-id", Data[0].arr_data[j].cont_id);
+                            }
+                        }
+                        for (var j = 0; j < Data[0].arr_rmk.length; j++) {
+
+                            if (j == 0) {
+                                $('.remark-list').nextAll('.remark-list').remove();
+                                $('.remark-list').attr("remark-id", Data[0].arr_rmk[j].item_id);
+                                $('.remark').val(Data[0].arr_rmk[j].remark);
+                                $('.create_remark_by').append(Data[0].arr_rmk[j].create_by);
+                            }
+                            else {
+                                $('#btn-add-remark').before($('#btn-add-remark').prev().clone());
+                                $('#btn-add-remark').prev().find('.remark').val(Data[0].arr_rmk[j].remark);
+                                $('#btn-add-remark').prev().find('[name="del-remark"]').prop('disabled', false);
+                                $('#btn-add-remark').prev('.remark-list').removeAttr("remark-id");
+                                $('#btn-add-remark').prev('.remark-list').attr("remark-id", Data[0].arr_rmk[j].item_id);
+                                $('#btn-add-remark').prev('.create_remark_by').append(Data[0].arr_rmk[j].create_by);
+                            }
+
+                        }
+
+
+                        $('#btn-del').prop('disabled', false);
+                        if (Data[0].isitem) {
+                            $('#btn-del').prop('disabled', true);
+                        }
+
+                    }
+
+                },
+                complete: function () {
+                    GetReq();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function Detail() {
+            arr_cont = [];
+            arr_remark = [];
+            $('[class*=cont-list]').each(function () {
+                if ($(this).find('.cont_person').val() != "") {
+                    arr_cont.push({
+                        cont_id: $(this).attr('cont-id'),
+                        cont_person_name: $(this).find('.cont_person').val(),
+                        cont_pos: $(this).find('.cont_pos').val(),
+                        cont_person_mobile: $(this).find('.cont_mobile').val()
+                    });
+                }
+            });
+            $('[class*=remark-list]').each(function () {
+                if ($(this).find('.remark').val() != "") {
+                    arr_remark.push({
+                        item_id: $(this).attr('remark-id'),
+                        remark: $(this).find('.remark').val(),
+                    });
+                }
+            });
+            var client_name = $('.client_name').val();
+            var client_address = $('.client_address').val();
+            var client_tel = $('.client_tel').val();
+            var postData = JSON.stringify({ arr_data: arr_cont, arr_rmk: arr_remark, client_name: client_name, client_address: client_address, client_tel: client_tel, client_id: client_id, type: type });
+            return postData
+        }
+        function Update() {
+            var det = Detail();
+            $.ajax({
+                url: '@Url.Action("Update","Client")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                contentType: "application/json; charset=utf-8",
+                data: det,
+                success: function (Data) {
+                    $('#detailModal').modal('hide');
+                    $('#confirmDelModal').modal('hide');
+                    swalDefaultSuccess();
+                    client_id = 0;
+                    Get();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function GetReq() {
+            $.ajax({
+                url: '@Url.Action("GetReqByClentID", "Client")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                data: { id: client_id },
+                success: function (Data) {
+                    $('.req-list').html("");
+                    for (var i = 0; i < Data.length; i++) {
+                        var r_s = "warning";
+                        if (Data[i].req_status.toLowerCase() == "open") {
+                            r_s = "success";
+                        }
+                        $('.req-list').append('<li req-id="">' +
+                            '<a href="@Url.Action("Detail","Requisition")?req_id=' + Data[i].req_id + '&&client_id=' + client_id + '" target="_blank">' +
+                            '<span class="text">' + Data[i].req_no + '</span>' +
+                            '<span class="text"> : ' + Data[i].title + '</span>' +
+                            '<span class="text"> <i class="fas fa-drum"></i> ' + Data[i].position + '</span>' +
+                            '<small class="badge badge-' + r_s + '">' + Data[i].req_status + '</small>' +
+                            '<div class="tools">' +
+                            '<i class="fas fa-file-invoice text-blue"></i>' +
+                            '</div>' +
+                            '</a>' +
+                            '</li>');
+                    }
+                    if (Data.length == 0) {
+                        $('.req-list').append('<li req-id="">' +
+                            '<span class="text">Data not found</span>' +
+                            '</li>');
+                    }
+
+                },
+                complete: function () {
+                    autoheight();
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function UploadDet() {
+            $('[class*="select-file"]').each(function () {
+                $(this).children('form').remove();
+            });
+            $('.select-file').append('<form id="uploader"><input id="fileInput" type="file" accept="application/pdf,image/png, image/jpeg,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" name="nfile"></form>');
+            GetFile();
+        }
+        function GetFile() {
+            $.ajax({
+                url: '@Url.Action("GetSrvByClientID", "Client")',
+                type: 'GET',
+                dataType: 'json',
+                data: { client_id: client_id },
+                success: function (Data) {
+                    $('.srv-list').html("");
+                    for (var i = 0; i < Data.length; i++) {
+                        $('.srv-list').append('<li>' +
+                            '<a href="#" >' +
+                            '<span title="View Service Agreement" class="btn-view-srv" srv-id=' + Data[i].srv_id + ' file-name="' + Data[i].file_name + '" class="text-green">' + Data[i].file_name + '</span>' +
+                            '<span class="text-gray"> <i class="fas fa-file-upload"></i> upload by : ' + Data[i].create_by + '</span>' +
+                            '<div class="tools" style="display: block;">' +
+                            '<i class="fas fa-trash-alt btn-del-srv" srv-id=' + Data[i].srv_id + ' file-name="' + Data[i].file_name + '"></i>' +
+                            '</div>' +
+                            '</a>' +
+                            '</li>');
+                    }
+                }
+            });
+        }
+        function DelSrv() {
+            $.ajax({
+                url: '@Url.Action("DeleteSrv", "Client")',
+                type: 'POST',
+                dataType: 'json',
+                data: { srv_id: srv_id },
+                success: function (Data) {
+                    $('#confirmDelModal').modal('hide');
+                    swalDefaultSuccess();
+                    GetFile();
+                }
+            });
+        }
+        //------------------------btn-------------------------//
+        $('#btn-modal').on('click', function () {
+            $('.card-req').hide();
+            $('.cont-list').nextAll('.cont-list').remove();
+            $('.req-list').html("");
+            $('.client_name').val('');
+            $('.client_address').val('');
+            $('.client_tel').val('');
+            $('.cont_person').val('');
+            $('.cont_mobile').val('');
+            $('.remark').val('');
+            $('.create_remark_by').html('');
+            $('.cont-list').attr('cont-id', '');
+            $('.remark-list').attr('remark-id', '');
+            $('.cont_pos').val('');
+            $('#btn-del').css("display", "none");
+            type = "insert";
+            $('#btn-save').html("");
+            $('#btn-save').append("Create");
+            $('#ModalLabel').html("");
+            $('#ModalLabel').append("New Client");
+            $('#detailModal').modal();
+        });
+        $('.tb-list').on('click', 'td', function () {
+            $('.card-req').show();
+            client_id = $(this).closest('tr').attr('client-id');
+            client_name = $(this).closest('tr').attr('client-name');
+            Get();
+            UploadDet();
+            $('#btn-del').css("display", "block");
+            type = "update";
+            $('#btn-save').html("");
+            $('#btn-save').append("Save Changes");
+            $('#ModalLabel').html("");
+            $('#ModalLabel').append("Client Detail");
+            $('#detailModal').modal();
+        });
+        $('#btn-save').on('click', function () {
+            if ($('#formValidate').valid()) {
+                Update();
+            }
+        });
+        $('#btn-del').on('click', function () {
+            type = "delete"
+            $('.client-name').html("");
+            $('.client-name').append(client_name);
+            $('#confirmDelModal').modal();
+            $('#btn-conf-del').css("display", "block");
+            $('#btn-conf-del-srv-file').css("display", "none");
+        });
+        $('#btn-conf-del').on('click', function () {
+            Update();
+        });
+        $('#btn-add-cont').on('click', function () {
+            $(this).before($(this).prev().clone());
+            $(this).prev().find('.cont_person').val('');
+            $(this).prev().find('.cont_pos').val('');
+            $(this).prev().find('.cont_mobile').val('');
+            $(this).prev().find('[name="del-cont"]').prop('disabled', false);
+            $(this).prev().removeAttr('cont-id');
+        });
+        $(document).on('click', '[name="del-cont"]', function (e) {
+            $(this).closest('div').remove();
+        });
+        $('#btn-add-remark').on('click', function () {
+            $(this).before($(this).prev().clone());
+            $(this).prev().find('.remark').val('');
+            $(this).prev().find('.create_remark_by').html("");
+            $(this).prev().find('[name="del-remark"]').prop('disabled', false);
+            $(this).prev().removeAttr('remark-id');
+            $(this).prev().find('.create_remark_by').html("");
+        });
+        $(document).on('click', '[name="del-remark"]', function (e) {
+            $(this).closest('div').remove();
+        });
+        $(document).on('click', '.btn-upload-file', function (e) {
+            var file = $('#fileInput')[0].files;
+            if (file.length > 0) {
+                $('#fileInput').removeClass('error');
+                if ($('.srv_file_name').val() != "") {
+                    $('#srv_file_name-error').hide()
+                    UploadFile();
+                }
+                else {
+                    $('#srv_file_name-error').show();
+                }
+
+            }
+            else {
+                $('#fileInput').addClass('error');
+                $('#fileInput').append('<div id="fileInput-error" class="error">This field is required.</div>');
+            }
+        });
+       /* var parent = $('embed.file_name').parent();*/
+        $(document).on('click', '.btn-view-srv', function () {
+            srv_id = $(this).attr('srv-id');
+            @*var file_name = $(this).attr('file-name');
+            var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenClientFile", "Client")?srv_id=' + srv_id);
+            parent.append(new_item);
+            $('.srv-file-name').html("");
+            $('.srv-file-name').append(file_name);
+            $('#clientModal').modal();*@
+            var base64num = btoa(srv_id);
+            var encodeuri = encodeURIComponent(base64num);
+            window.open("@Url.Action("OpenClientFile", "Client")?srv_id=" + encodeuri);
+        });
+        $(document).on('click', '.btn-del-srv', function () {
+            srv_id = $(this).attr('srv-id');
+            var file_name = $(this).attr('file-name');
+            $('.client-name').html("");
+            $('.client-name').append(file_name + " file");
+            $('#confirmDelModal').modal();
+            $('#btn-conf-del').css("display", "none");
+            $('#btn-conf-del-srv-file').css("display", "block");
+        });
+        $('#btn-conf-del-srv-file').on('click', function () {
+            DelSrv();
+        });
+        //---------------------upload-file-------------------------//
+        var formdata;
+        $(document).on("change", "#fileInput", function () {
+            formdata = new FormData();
+            file = $('#fileInput')[0].files;
+            ValidateSize(file);
+            var fileInput = document.getElementById('fileInput');
+            var sfilename = fileInput.files[0].name;
+            formdata.append(sfilename, fileInput.files[0]);
+        });
+
+        function ValidateSize(file) {
+            var FileSize = file[0].size / 1024 / 1024; // in MB
+            if (FileSize > 150) {
+                $('#fileInput').val('');
+                alert('File size exceeds 150 MB');
+            }
+        }
+
+        function UploadFile() {
+            $('#fileInput').val('');
+            var srv_file_name = $('.srv_file_name').val();
+            formdata.append('client_id', client_id);
+            formdata.append('srv_file_name', srv_file_name);
+            $.ajax({
+                url: '@Url.Action("SaveClientFile", "Client")',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                cache: false,
+                data: formdata,
+                async: false,
+                success: function (result) {
+                    $('.srv_file_name').val('');
+                    swalDefaultSuccess();
+                    GetFile();
+                },
+                error: function (err) {
+                    alert(err.statusText);
+                },
+            });
+            GetReq();
+        }
+        //---------------------alert--------------------------//
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        function swalDefaultSuccess() {
+            Toast.fire({
+                type: 'success',
+                title: 'Update successfully'
+            })
+        }
+        //------------------------textarea----------------------------//
+        $(document).on('keyup', '.box-size', function (e) {
+            autoheight(this);
+        });
+
+        function autoheight() {
+            $('[class*="box-size"]').each(function () {
+                var a = this;
+                if (!$(a).prop('scrollTop')) {
+
+                    var x = a.scrollHeight;
+                    console.log('a :' + x);
+                    a.style.height = "1px";
+                    a.style.height = (50 + a.scrollHeight) + "px";
+
+                    //do {
+                    //    var b = $(a).prop('scrollHeight');
+                    //    var h = $(a).height();
+                    //    $(a).height(h - 5);
+                    //}
+                    //while (b && (b != $(a).prop('scrollHeight')));
+
+                };
+                //$(a).height($(a).prop('scrollHeight') + 20);
+
+            });
+            //$('[class*="remark-list"]').each(function () {
+            //    console.log('b0 :');
+            //    $(this).find('[class*="box-size"]').each(function () {
+            //        var a = this;
+            //        if (!$(a).prop('scrollTop')) {
+            //            var x = $(a).prop('scrollHeight');
+            //            console.log('b :' + x);
+            //            a.style.height = "1px";
+            //            a.style.height = (50 + a.scrollHeight) + "px";
+            //        };
+
+            //    });
+            //});
+        }
+    });
+</script>

@@ -1,0 +1,887 @@
+﻿@using MeExpert.Models;
+@using MeExpert.CommonProvide;
+@{
+    var a = new Management();
+    List<Education> edu = a.GetInst("edu");
+    List<Education> major = a.GetInst("major");
+    List<Education> faculty = a.GetInst("faculty");
+}
+@if (ViewBag.CandID == 0)
+{
+    ViewBag.Title = "Create Candidate";
+}
+else { ViewBag.Title = "Candidate Detail"; }
+<style>
+    .app-det:hover {
+        color: #007bff !important;
+        border-bottom: 1px solid #007bff;
+        cursor: pointer;
+    }
+
+    a.disabled {
+        pointer-events: none;
+        cursor: default;
+    }
+</style>
+<div class="col-12">
+    <div class="card">
+        <div class="card-body">
+            <div class="card card-primary card-outline card-outline-tabs">
+                <div class="card-header p-0 border-bottom-0">
+                    <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="personal-tab" data-toggle="pill" href="#personal" role="tab" aria-controls="personal" aria-selected="true"><i class="fas fa-user"></i> Personal Information <span style="font-size: 11px;font-weight: 400;color: #6c757d;">*Required</span></a>
+                        </li>
+                        @*<li class="nav-item">
+                                <a class="nav-link edu-tab" id="edu-tab" data-toggle="pill" href="#edu" role="tab" aria-controls="edu" aria-selected="false"><i class="fas fa-user-graduate"></i> Education</a>
+                            </li>*@
+                        <li class="nav-item">
+                            <a class="nav-link apply-tab" id="apply-tab" data-toggle="pill" href="#apply" role="tab" aria-controls="apply" aria-selected="false"><i class="fas fa-file-invoice"></i> Application Record</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="custom-tabs-three-tabContent">
+                        <div class="tab-pane fade active show" id="personal" role="tabpanel" aria-labelledby="personal-tab">
+                            <div class="row">
+                                <div class="col-12" style=" margin-bottom: 2%;">
+                                    <button type="button" class="btn btn-success" style="float:right" id="btn-create-prs"> </button>
+                                    <button type="button" class="btn btn-danger" style="float:right;display:none;margin-right: 1%;" id="btn-del-prs"><i class='fas fa-trash'></i> Delete</button>
+                                </div>
+                            </div>
+                            <form id="formValidateCand" class="formValidateCand" method="get">
+                                <div class="row">
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <label>Gender<span class="req-asterisk">*</span></label>
+                                            <select class="form-control form-control-sm gender" name="sel_gender">
+                                                <option value="" selected>--Select--</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>First Name<span class="req-asterisk">*</span></label>
+                                            <input type="text" class="form-control form-control-sm f_name" name="f_name" />
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>Last Name<span class="req-asterisk">*</span></label>
+                                            <input type="text" class="form-control form-control-sm l_name" name="l_name" />
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <label>Birth Date</label>
+                                            <input type="text" class="datepicker form-control form-control-sm brith_date" />
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>E-Mail</label>
+                                            <input type="text" class="form-control form-control-sm mail" name="mail" />
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <label>Mobile<span class="req-asterisk">*</span><span class="warning-mobile" style="font-weight: 600;font-size: 10px"></span></label>
+                                            <input type="text" class="form-control form-control-sm mobile" name="tel" />
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <label>Mobile (sub)</label>
+                                            <input type="text" class="form-control form-control-sm mobile_sub" name="tel_s" />
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <label>TOEIC</label>
+                                            <input type="number" class="form-control form-control-sm toeic" />
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <label>Start Working</label>
+                                            <input type="text" class="datepicker form-control form-control-sm s_date" />
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <label>ID Card</label>
+                                            <input type="text" class="form-control form-control-sm id_card" name="id_card" />
+                                        </div>
+                                    </div>
+                                    <div class="col-7">
+                                        <div class="form-group">
+                                            <label>Remark</label>
+                                            <textarea type="text" class="form-control form-control-sm remark box-size" name="remark"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-3 offset-9">
+                                        <div class="form-group">
+                                            <select class="form-control  form-control-sm emp_status">
+                                                <option value="Unemployed">Unemployed</option>
+                                                <option value="Employed">Employed</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <h6 style="color: #007bff"><i class="fas fa-user-graduate"></i> Education</h6>
+                            <hr />
+                            <form id="formValidateEdu">
+                                <div class="row">
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <label>Degree<span class="req-asterisk">*</span></label>
+                                            <select class="form-control form-control-sm degree" name="degree">
+                                                <option value="Doctoral">Doctoral</option>
+                                                <option value="Master">Master</option>
+                                                <option value="Bachelor" selected>Bachelor</option>
+                                                <option value="Diploma/High Vocational">Diploma/High Vocational</option>
+                                                <option value="Vocational">Vocational</option>
+                                                <option value="High School">High School</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-group">
+                                            <label>School/University<span class="req-asterisk">*</span></label>
+                                            @*<input type="text" class="form-control form-control-sm inst_name" name="inst" />*@
+                                            <select class="form-control form-control-sm inst_name selete2-inst" data-live-search="true" name="inst">
+                                                @foreach (Education item in edu)
+                                                {
+                                                    <option value="@item.inst_name">@item.inst_name</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <label>From</label>
+                                            <input type="text" class="datepicker form-control form-control-sm from_date" />
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <label>To</label>
+                                            <input type="text" class="datepicker form-control form-control-sm to_date" />
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="form-group">
+                                            <label>Faculty<span class="req-asterisk">*</span></label>
+                                            @*<input type="text" class="form-control form-control-sm faculty" name="faculty" />*@
+                                            <select class="form-control form-control-sm faculty selete2-inst" data-live-search="true"  name="faculty">
+                                                @foreach (Education item in faculty)
+                                                {
+                                                    <option value="@item.faculty">@item.faculty</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-5">
+                                        <div class="form-group">
+                                            <label>Major<span class="req-asterisk">*</span></label>
+                                            @*<input type="text" class="form-control form-control-sm major" name="major" />*@
+                                            <select class="form-control form-control-sm major selete2-inst" data-live-search="true" name="major" >
+                                                @foreach (Education item in major)
+                                                {
+                                                    <option value="@item.major">@item.major</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-2">
+                                        <div class="form-group">
+                                            <label>Grade</label>
+                                            <input type="number" class="form-control form-control-sm grade" />
+                                        </div>
+                                    </div>
+                                    <div class="col-1">
+                                        <div class="form-group">
+                                            <button class="btn btn-success" style="margin-top: 37%;" id="btn-create-edu">Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <table class="table table-sm table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Delete</th>
+                                                        <th>From</th>
+                                                        <th>To</th>
+                                                        <th>Degree</th>
+                                                        <th>School/University</th>
+                                                        <th>Faculty</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="tb-edu">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="tab-pane fade" id="edu" role="tabpanel" aria-labelledby="edu-tab">
+
+                            </div>*@
+                        <div class="tab-pane fade" id="apply" role="tabpanel" aria-labelledby="apply-tab">
+                            <form id="formValidateApply" class="formValidateApply" method="get">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <a class="btn btn-info btn-refreash" style="float:right;margin-bottom: 2%;">Clear Data</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <form id="uploader">
+                                            <input id="fileInput" type="file" accept="application/pdf,image/png, image/jpeg,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" name="cv_file">
+                                        </form>
+                                        <h6 class="cv_no" style="color:#007bff"></h6>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>Apply Position<span class="req-asterisk">*</span></label>
+                                            <input type="text" class="form-control form-control-sm app_posi" name="app_posi" />
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <label>Expected Salary</label>
+                                            <input type="number" class="form-control form-control-sm exp_sal" name="exp_sal" />
+                                        </div>
+                                    </div>
+                                    <div class="col-3">
+                                        <div class="form-group">
+                                            <label>Apply Date<span class="req-asterisk">*</span></label>
+                                            <input type="text" class="datepicker form-control form-control-sm app_date" autocomplete="off" name="app_date" />
+                                        </div>
+                                    </div>
+                                    <div class="col-7">
+                                        <div class="form-group">
+                                            <label>Current Working Industry</label>
+                                            <input type="text" class="form-control form-control-sm curr_work" name="curr_work" />
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>Keywords</label>
+                                            <textarea class="form-control form-control-sm keyword" name="keyword"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-group">
+                                            <label>Application Remarks</label>
+                                            <textarea class="form-control form-control-sm app_remark" name="app_remark"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <a class="btn btn-success" style="float:right;margin-bottom: 2%;" id="btn-save-cv"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <table class="table table-sm table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Action</th>
+                                                            <th>No.</th>
+                                                            <th>Apply Position</th>
+                                                            <th>Exp. Salary</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="tb-apply">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card -->
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="confirmDelModal" style="z-index: 9999;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <span><i class="fas fa-exclamation-circle text-warning" style="font-size:60px;"></i></span>
+                <h4 class="desc-confirm"></h4>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btn-conf-del-prs">Delete</button>
+                <button type="button" class="btn btn-danger" id="btn-conf-del-edu">Delete</button>
+                <button type="button" class="btn btn-danger" id="btn-conf-del-apply">Delete</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal" tabindex="-1" role="dialog" id="cvModal" style="z-index: 9999;">
+        <div class="modal-dialog modal-lg" role="document" style="max-width: 835px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">CV No. <span class="cv_number_titile"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="col-12 text-center">
+                        <h4 class="cv-no"></h4>
+                    </div>
+                    <div class="col-12 text-center">
+                        <embed class="file_name" width="800px" height="400px"/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#loader").css("display", "none");
+        $(document).ajaxStart(function () {
+            $("#loader").css("display", "block");
+        });
+        $(document).ajaxComplete(function () {
+            $("#loader").css("display", "none");
+        });
+         $(".selete2-inst").select2({
+            tags: true,
+            width: '100%',
+            insertTag: function (data, tag) {
+                // Insert the tag at the end of the results
+                data.push(tag);
+               // new_position = data[0].text;
+            }
+        });
+        var type = "insert";
+        var cand_id = "@ViewBag.CandID";
+        var arr_edu = [];
+        var cv_no="";
+        var format_date = {
+            format: 'dd-M-yyyy',
+            todayHighlight: true,
+        }
+        var apply_type = "insert";
+        var cv_item = 0;
+        var cv_id = 0;
+        $('.datepicker').datepicker(format_date);
+        $('#btn-save-cv').addClass('disabled')
+        $('#btn-save-cv').append("Add CV");
+        $('#btn-create-prs').append("<i class='fas fa-plus-circle'></i> Create");
+        if (cand_id != 0) {
+            type = "update";
+            $('#btn-save-cv').removeClass('disabled');
+            $('#btn-create-prs').html("");
+            $('#btn-create-prs').append("<i class='fas fa-share-square'></i> Update");
+            $('#btn-del-prs').css("display","block");
+            GetDetail();
+            CheckCandId();
+        }
+        function RefreshPrs() {
+            $('.gender').val('');
+            $('.f_name').val('');
+            $('.l_name').val('');
+            $('.brith_date').val('');
+            $('.mail').val('');
+            $('.mobile').val('');
+            $('.mobile_sub').val('');
+            $('.toeic').val('');
+            $('.s_date').val('');
+            $('.id_card').val('');
+            $('.remark').val('');
+            $('.emp_status').val('');
+            $('.tb-edu').html('');
+        }
+        function RefreshEdu() {
+            $('.degree').val('Bachelor');
+            $('.inst_name').val('');
+            $('.from_date').val('');
+            $('.to_date').val('');
+            $('.faculty').val('');
+            $('.major').val('');
+            $('.grade').val('');
+        }
+        function RefreshApp() {
+            cv_id = 0;
+            $('.app_posi').val('');
+            $('.exp_sal').val('');
+            $('.app_date').val('');
+            $('.curr_work').val('');
+            $('.app_remark').val('');
+            $('.keyword').val('');
+        }
+
+        function GetDetail() {
+            $.ajax({
+                url: '@Url.Action("GetCandDetail", "Candidate")',
+                type: 'GET',
+                dataType: 'json',
+                data: { cand_id: cand_id },
+                success: function (Data) {
+                    RefreshPrs();
+                    $('.gender').val(Data.personalInfo[0].gender);
+                    $('.f_name').val(Data.personalInfo[0].first_name);
+                    $('.l_name').val(Data.personalInfo[0].last_name);
+                    $('.brith_date').val(Data.personalInfo[0].birth_day);
+                    $('.mail').val(Data.personalInfo[0].mail);
+                    $('.mobile').val(Data.personalInfo[0].mobile);
+                    $('.mobile_sub').val(Data.personalInfo[0].mobile_no_2);
+                    $('.toeic').val(Data.personalInfo[0].toeic_score);
+                    $('.s_date').val(Data.personalInfo[0].start_working);
+                    $('.id_card').val(Data.personalInfo[0].id_card);
+                    $('.remark').val(Data.personalInfo[0].remarks);
+                    $('.emp_status').val(Data.personalInfo[0].employ_status);
+
+                    $('.tb-apply').html("");
+                    $('.tb-edu').html("");
+                    for (var i = 0; i < Data.education.length; i++) {
+                        $('.tb-edu').append(
+                            "<tr no-"+i+">" +
+                            "<td><button class='btn btn-danger' name='del-inst' title='Delete'><i class='fas fa-trash'></i></button></td>" +
+                            "<td>" + Data.education[i].from_date + "</td>" +
+                            "<td>" + Data.education[i].to_date + "</td>" +
+                            "<td>" + Data.education[i].degree + "</td>" +
+                            "<td>" + Data.education[i].inst_name + "</td>" +
+                            "<td>" + Data.education[i].faculty + "</td>" +
+                            "</tr>");
+                        $('tr[no-' + i + ']').attr("item-id", Data.education[i].item_id);
+                    }
+                    if (Data.education.length == 0) {
+                        $('.tb-edu').append(
+                            "<tr class='not-edu-data'>" +
+                            "<td colspan='6'>Data not found</td>" +
+                            "</tr>");
+                    }
+                    for (var i = 0; i < Data.apply.length; i++) {
+                        //var check_file = ""
+                        //if (Data.apply[i].cv_file == "") {
+                        //    check_file = " disabled "
+                        //}
+                        var base64num = btoa(Data.apply[i].cv_id);
+                        var encodeuri = encodeURIComponent(base64num);
+                        $('.tb-apply').append(
+                            "<tr no-"+i+">" +
+                            "<td><button class='btn btn-danger' name='del-cv' title='Delete'><i class='fas fa-trash'></i></button><a href='@Url.Action("OpenCvFile", "Candidate")?cv_id=" + encodeuri + "' target='_blank' class='btn btn-info' title='CV' name='view-cv' style='margin-left: 2%;' ><i class='fas fa-eye'></i></a></td>" +
+                            "<td><a class='app-det' name='app-det' style='color: #007bff !important'>" + Data.apply[i].cv_no + "</a></td>" +
+                            "<td>" + Data.apply[i].apply_position + "</td>" +
+                            "<td>" + Data.apply[i].exp_salary + "</td>" +
+                            "</tr>");
+                        $('tr[no-'+i+']').attr("cv-path", Data.apply[i].cv_file);
+                        $('tr[no-' + i + ']').attr("cv-no", Data.apply[i].cv_no);
+                        $('tr[no-' + i + ']').attr("cv-id", Data.apply[i].cv_id);
+                        $('tr[no-' + i + ']').attr("cv-item", Data.apply[i].item_id);
+                        $('tr[no-' + i + ']').attr("posi", Data.apply[i].apply_position);
+                        $('tr[no-' + i + ']').attr("exp-salary", Data.apply[i].exp_salary);
+                        $('tr[no-' + i + ']').attr("app-date", Data.apply[i].apply_date);
+                        $('tr[no-' + i + ']').attr("industry", Data.apply[i].industry);
+                        $('tr[no-' + i + ']').attr("app-remark", Data.apply[i].remark);
+                        $('tr[no-' + i + ']').attr("keyword", Data.apply[i].keyword);
+                    }
+                    if (Data.apply.length == 0) {
+                        $('.tb-apply').append(
+                            "<tr>" +
+                            "<td colspan='4'>Data not found</td>" +
+                            "</tr>");
+                    }
+                },
+                 error: function (jqXHR, textStatus, errorThrown) {
+                     alert("Services is unvailable,Please try again later");
+                 }
+            });
+        }
+        function CheckCandId() {
+            $.ajax({
+                url: '@Url.Action("CheckCandIdFK","Candidate")',
+                type: 'GET',
+                dataType: 'json',
+                data: { cand_id: cand_id },
+                success: function (Data) {
+                    if (Data) {
+                        $('#btn-del-prs').prop("disabled", true);
+                    }
+                    else {
+                        $('#btn-del-prs').prop("disabled", false);
+                    }
+                }
+            });
+        }
+        function Detail() {
+            var gender = $('.gender').val();
+            var f_name = $('.f_name').val();
+            var l_name = $('.l_name').val();
+            var brith_date = $('.brith_date').val();
+            var mail = $('.mail').val();
+            var mobile = $('.mobile').val();
+            var mobile_sub = $('.mobile_sub').val();
+            var toeic = $('.toeic').val();
+            var s_date = $('.s_date').val();
+            var id_card = $('.id_card').val();
+            var remark = $('.remark').val();
+            var emp_status = $('.emp_status').val();
+
+            arr_edu = [];
+            var tr = $('.tb-edu tr');
+            for (var i = 0; i < tr.length; i++) {
+                arr_edu.push({
+                    cand_id: cand_id,
+                    item_id: tr[i].getAttribute('item-id'),
+                    degree: tr[i].getAttribute('degree'),
+                    inst_name: tr[i].getAttribute('inst-name'),
+                    from_date: tr[i].getAttribute('from-date'),
+                    to_date: tr[i].getAttribute('to-date'),
+                    faculty: tr[i].getAttribute('faculty'),
+                    major: tr[i].getAttribute('major'),
+                    grade: tr[i].getAttribute('grade'),
+                });
+            }
+            var postData = JSON.stringify({
+                educations: arr_edu, cand_id: cand_id, gender: gender, first_name: f_name, last_name: l_name, birth_day: brith_date,
+                mail: mail, mobile_no_1: mobile, mobile_no_2: mobile_sub, toeic_score: toeic, start_working: s_date,
+                id_card: id_card, cand_remarks: remark, employ_status: emp_status, type: type
+            });
+            return postData;
+        }
+        function UpdatePrs() {
+            var det = Detail();
+            $.ajax({
+                url: '@Url.Action("UpdateCand","Candidate")',
+                type: 'POST',
+                dataType: 'json',
+                cache: false,
+                contentType: "application/json; charset=utf-8",
+                data: det,
+                success: function (Data) {
+                    window.location.href = "@Url.Action("Detail","Candidate")?cand_id=" + Data;
+                    //cand_id = Data;
+                    //swalDefaultSuccess();
+                    //$('#btn-save-cv').removeClass('disabled');
+                },
+                 error: function (jqXHR, textStatus, errorThrown) {
+                     alert("Services is unvailable,Please try again later");
+                 }
+            });
+        }
+        function DetApply() {
+            app_posi = $('.app_posi').val();
+            exp_sal = $('.exp_sal').val();
+            app_date = $('.app_date').val();
+            curr_work = $('.curr_work').val();
+            keyword = $('.keyword').val();
+            app_remark = $('.app_remark').val();
+            return {
+                cand_id: cand_id, apply_position: app_posi, exp_salary: exp_sal, apply_date: app_date, industry: curr_work, remark: app_remark, keyword: keyword, cv_no: cv_no, item_id: cv_item
+            }
+        }
+        function InsertApply() {
+            UploadFile();
+            if (cv_no != "" && cv_no != undefined) {
+                var det = DetApply();
+                $.ajax({
+                    url: '@Url.Action("InsertApplyRecordByCandID", "Candidate")',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: det,
+                    success: function (Data) {
+                        swalDefaultSuccess();
+                        GetDetail();
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        alert("Services is unvailable,Please try again later");
+                    }
+                });
+            }
+        }
+         function UpdateApply() {
+            var det = DetApply();
+            $.ajax({
+                url: '@Url.Action("UpdateApplyByItemID", "Candidate")',
+                type: 'POST',
+                dataType: 'json',
+                data: det,
+                success: function (Data) {
+                     apply_type = "insert";
+                    $('#fileInput').css("display", "block");
+                    $('.cv_no').html("");
+                    $('#btn-save-cv').html("");
+                    $('#btn-save-cv').append("Add CV");
+                    RefreshApp();
+                    GetDetail();
+                },
+                 error: function (jqXHR, textStatus, errorThrown) {
+                     alert("Services is unvailable,Please try again later");
+                 }
+            });
+        }
+        function DelCv() {
+            $.ajax({
+                url: '@Url.Action("DelApplyByItemID", "Candidate")',
+                type: 'POST',
+                dataType: 'json',
+                data: { item_id: cv_item },
+                success: function (Data) {
+                    apply_type = "insert";
+                    $('#fileInput').css("display", "block");
+                    $('.cv_no').html("");
+                    $('#btn-save-cv').html("");
+                    $('#btn-save-cv').append("Add CV");
+                    RefreshApp();
+                    GetDetail();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    alert("Services is unvailable,Please try again later");
+                }
+            });
+        }
+        function DelPerson() {
+            $.ajax({
+                url: '@Url.Action("DelCandByCandID", "candidate")',
+                type: 'POST',
+                dataType: 'json',
+                data: { cand_id: cand_id },
+                success: function () {
+                    window.location.href = "@Url.Action("ManageCandidate","Candidate")";
+                },
+                 error: function (jqXHR, textStatus, errorThrown) {
+                     alert("Services is unvailable,Please try again later");
+                 }
+            });
+        }
+        //---------------------btn--------------------------//
+        $('#btn-create-prs').on('click', function () {
+            if ($('#formValidateCand').valid()) {
+                UpdatePrs();
+            }
+        });
+        $('#btn-create-edu').on('click', function (e) {
+            if ($('#formValidateEdu').valid()) {
+                var degree = $('.degree').val();
+                var inst_name = $('.inst_name').val();
+                var from_date = $('.from_date').val();
+                var to_date = $('.to_date').val();
+                var faculty = $('.faculty').val();
+                var major = $('.major').val();
+                var grade = $('.grade').val();
+                $('.not-edu-data').remove();
+                $('.tb-edu').append(
+                    "<tr>" +
+                    "<td><button class='btn btn-danger' name='del-inst' title='Delete'><i class='fas fa-trash'></i></button></td>" +
+                    "<td>" + from_date + "</td>" +
+                    "<td>" + to_date + "</td>" +
+                    "<td>" + degree + "</td>" +
+                    "<td>" + inst_name + "</td>" +
+                    "<td>" + faculty + "</td>" +
+                    "</tr>"
+                );
+                $('tr').attr('degree', degree);
+                $('tr').attr('inst-name', inst_name);
+                $('tr').attr('from-date', from_date);
+                $('tr').attr('to-date', to_date);
+                $('tr').attr('faculty', faculty);
+                $('tr').attr('major', major);
+                $('tr').attr('grade', grade);
+                RefreshEdu();
+                e.preventDefault();
+            }
+        });
+
+        var inst_row;
+        $(document).on('click', '[name="del-inst"]', function () {
+            $('#btn-conf-del-edu').css("display", "block");
+            $('#btn-conf-del-apply').css("display", "none");
+            $('#btn-conf-del-prs').css("display", "none");
+            $('.desc-confirm').html("");
+            $('.desc-confirm').append("Confirm to delete education?");
+            $('#confirmDelModal').modal();
+            inst_row = this;
+        });
+        $('#btn-conf-del-edu').on('click', function () {
+            $(inst_row).closest('tr').remove();
+            $('#confirmDelModal').modal('hide');
+        });
+        $('#btn-save-cv').on('click', function () {
+            if ($('#formValidateApply').valid()) {
+                if (apply_type=="insert") {
+                    InsertApply();
+                }
+                else if (apply_type == "update") {
+                    UpdateApply();
+                }
+            }
+        });
+        //var parent = $('embed.file_name').parent();
+        @*$(document).on('click', '[name="view-cv"]', function () {
+            cv_id = $(this).closest('tr').attr('cv-id');
+            $('.cv_number_titile').html("");
+            $('.cv_number_titile').append($(this).closest('tr').attr('cv-no'));
+            var new_item = $('embed.file_name').attr('src', '@Url.Action("OpenCvFile","Candidate")?cv_id=' + cv_id);
+            parent.append(new_item);
+            $('#cvModal').modal();
+        });*@
+        $(document).on('click', '[name="app-det"]', function () {
+            apply_type = "update";
+            $('#fileInput').css("display", "none");
+            $('#btn-save-cv').html("");
+            $('#btn-save-cv').append("Save Change");
+            cv_item = $(this).closest('tr').attr("cv-item");
+            $('.cv_no').html("");
+            $('.cv_no').append($(this).closest('tr').attr("cv-no"));
+            $('.app_posi').val($(this).closest('tr').attr("posi"));
+            $('.exp_sal').val($(this).closest('tr').attr("exp-salary"));
+            $('.app_date').val($(this).closest('tr').attr("app-date"));
+            $('.curr_work').val($(this).closest('tr').attr("industry"));
+            $('.app_remark').val($(this).closest('tr').attr("app-remark"));
+            $('.keyword').val($(this).closest('tr').attr("keyword"));
+        });
+        $('.btn-refreash').on('click', function () {
+            apply_type = "insert";
+            $('#fileInput').css("display", "block");
+            $('.cv_no').html("");
+            $('#btn-save-cv').html("");
+            $('#btn-save-cv').append("Add CV");
+            RefreshApp();
+        });
+        $(document).on('click', '[name="del-cv"]', function () {
+            $('#btn-conf-del-edu').css("display","none");
+            $('#btn-conf-del-apply').css("display", "block");
+            $('#btn-conf-del-prs').css("display", "none");
+            $('.desc-confirm').html("");
+            $('.desc-confirm').append("Confirm to delete this application record?");
+            cv_item = $(this).closest('tr').attr("cv-item");
+            $('#confirmDelModal').modal();
+        });
+        $('#btn-conf-del-apply').on('click', function () {
+            DelCv();
+            $('#confirmDelModal').modal('hide');
+        });
+        $('#btn-del-prs').on('click', function () {
+            $('#btn-conf-del-edu').css("display", "none");
+            $('#btn-conf-del-apply').css("display", "none");
+            $('#btn-conf-del-prs').css("display", "block");
+            $('.desc-confirm').html("");
+            $('.desc-confirm').append("All related data will be deleted.<br/>Confirm to delete this candidate?");
+            $('#confirmDelModal').modal();
+        });
+        $('#btn-conf-del-prs').on('click', function () {
+            DelPerson();
+            $('#confirmDelModal').modal('hide');
+        });
+        //---------------------focus-out------------------------//
+        $('.mobile').on('focusout', function () {
+            var mb = $(this).val();
+            $.ajax({
+                url: '@Url.Action("CheckMobile","Candidate")',
+                type: 'GET',
+                dataType: 'json',
+                data: { mobile: mb, cand_id:"@ViewBag.CandID" },
+                success: function (Data) {
+                    $('.warning-mobile').html("");
+                    $('#btn-create-prs').prop("disabled", false);
+                    if (Data) {
+                        $('#btn-create-prs').prop("disabled", true);
+                       $('.warning-mobile').append('<i class="fas fa-exclamation-triangle text-yellow"></i> This mobile number isn&#8217;t avalible.');
+                    }
+                },
+                 error: function (jqXHR, textStatus, errorThrown) {
+                     alert("Services is unvailable,Please try again later");
+                 }
+            });
+        });
+          //---------------------alert--------------------------//
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000
+        });
+        function swalDefaultSuccess() {
+            Toast.fire({
+                type: 'success',
+                title: 'Created successfully'
+            })
+        }
+        //------------------------textarea----------------------------//
+        $(document).on('keyup', '.box-size', function (e) {
+            autoheight(this);
+        });
+
+        function autoheight() {
+            $('[class*="box-size"]').each(function () {
+                var a = this;
+                if (!$(a).prop('scrollTop')) {
+                    do {
+                        var b = $(a).prop('scrollHeight');
+                        var h = $(a).height();
+                        $(a).height(h - 5);
+                    }
+                    while (b && (b != $(a).prop('scrollHeight')));
+                };
+                $(a).height($(a).prop('scrollHeight') + 20);
+            })
+        }
+        //--------------------------------upload-file---------------------------------//
+         var formdata;
+        $(document).on("change", "#fileInput", function () {
+            formdata = new FormData();
+            file = $('#fileInput')[0].files;
+            ValidateSize(file);
+            var fileInput = document.getElementById('fileInput');
+            var sfilename = fileInput.files[0].name;
+            formdata.append(sfilename, fileInput.files[0]);
+        });
+
+        function ValidateSize(file) {
+            var FileSize = file[0].size / 1024 / 1024; // in MB
+            if (FileSize > 5) {
+                $('#fileInput').val('');
+                alert('File size exceeds 5 MB');
+            }
+        }
+
+        function UploadFile() {
+            $('#fileInput').val('');
+           var fname = $('.f_name').val();
+           var lname = $('.l_name').val();
+            formdata.append('uploadername', fname + "_" + lname);
+            $.ajax({
+                url: '@Url.Action("SaveFileSream", "Candidate")',
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                cache: false,
+                data:  formdata,
+                async: false,
+                success: function (result) {
+                    cv_no = result;
+                },
+                error: function (err) {
+                   alert(err.statusText);
+                },
+            });
+        }
+    });
+</script>
