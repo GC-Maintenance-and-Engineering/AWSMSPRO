@@ -1,25 +1,25 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\2022\\Project\\MeExpert\\",
+  "WorkspaceRootPath": "D:\\2025\\Project\\AWSMSPRO\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|d:\\2022\\project\\meexpert\\meexpert\\controllers\\candidatecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|d:\\2025\\project\\awsmspro\\meexpert\\controllers\\candidatecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|solutionrelative:meexpert\\controllers\\candidatecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|d:\\2022\\project\\meexpert\\meexpert\\controllers\\requisitioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|D:\\2025\\Project\\AWSMSPRO\\meexpert\\controllers\\requisitioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|solutionrelative:meexpert\\controllers\\requisitioncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|d:\\2022\\project\\meexpert\\meexpert\\views\\requisition\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|D:\\2025\\Project\\AWSMSPRO\\meexpert\\views\\requisition\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|solutionrelative:meexpert\\views\\requisition\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|d:\\2022\\project\\meexpert\\meexpert\\models\\req.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|D:\\2025\\Project\\AWSMSPRO\\meexpert\\models\\req.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|solutionrelative:meexpert\\models\\req.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|D:\\2022\\Project\\MeExpert\\meexpert\\views\\candidate\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "AbsoluteMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|D:\\2025\\Project\\AWSMSPRO\\meexpert\\views\\candidate\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{DAFE364B-7A8A-4BE6-BD68-03D0BA227440}|MeExpert\\MeExpert.csproj|solutionrelative:meexpert\\views\\candidate\\detail.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     }
   ],
@@ -36,24 +36,23 @@
               "$type": "Document",
               "DocumentIndex": 3,
               "Title": "Req.cs",
-              "DocumentMoniker": "D:\\2022\\Project\\MeExpert\\MeExpert\\Models\\Req.cs",
+              "DocumentMoniker": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Models\\Req.cs",
               "RelativeDocumentMoniker": "MeExpert\\Models\\Req.cs",
-              "ToolTip": "D:\\2022\\Project\\MeExpert\\MeExpert\\Models\\Req.cs",
+              "ToolTip": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Models\\Req.cs",
               "RelativeToolTip": "MeExpert\\Models\\Req.cs",
               "ViewState": "AQIAAGIAAAAAAAAAAIAzwGoAAAAqAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-05T02:26:32.179Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-05T02:26:32.179Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "CandidateController.cs",
-              "DocumentMoniker": "D:\\2022\\Project\\MeExpert\\MeExpert\\Controllers\\CandidateController.cs",
+              "DocumentMoniker": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Controllers\\CandidateController.cs",
               "RelativeDocumentMoniker": "MeExpert\\Controllers\\CandidateController.cs",
-              "ToolTip": "D:\\2022\\Project\\MeExpert\\MeExpert\\Controllers\\CandidateController.cs",
+              "ToolTip": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Controllers\\CandidateController.cs",
               "RelativeToolTip": "MeExpert\\Controllers\\CandidateController.cs",
-              "ViewState": "AQIAAPACAAAAAAAAAAAWwPgCAAANAAAA",
+              "ViewState": "AQIAAPACAAAAAAAAAAAWwAgDAAANAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-11-05T02:13:07.758Z",
               "EditorCaption": ""
@@ -62,40 +61,37 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "RequisitionController.cs",
-              "DocumentMoniker": "D:\\2022\\Project\\MeExpert\\MeExpert\\Controllers\\RequisitionController.cs",
+              "DocumentMoniker": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Controllers\\RequisitionController.cs",
               "RelativeDocumentMoniker": "MeExpert\\Controllers\\RequisitionController.cs",
-              "ToolTip": "D:\\2022\\Project\\MeExpert\\MeExpert\\Controllers\\RequisitionController.cs",
+              "ToolTip": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Controllers\\RequisitionController.cs",
               "RelativeToolTip": "MeExpert\\Controllers\\RequisitionController.cs",
               "ViewState": "AQIAALACAAAAAAAAAAAjwIgCAABJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-11-05T02:13:47.049Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-11-05T02:13:47.049Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
               "Title": "Detail.cshtml",
-              "DocumentMoniker": "D:\\2022\\Project\\MeExpert\\MeExpert\\Views\\Requisition\\Detail.cshtml",
+              "DocumentMoniker": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Views\\Requisition\\Detail.cshtml",
               "RelativeDocumentMoniker": "MeExpert\\Views\\Requisition\\Detail.cshtml",
-              "ToolTip": "D:\\2022\\Project\\MeExpert\\MeExpert\\Views\\Requisition\\Detail.cshtml",
+              "ToolTip": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Views\\Requisition\\Detail.cshtml",
               "RelativeToolTip": "MeExpert\\Views\\Requisition\\Detail.cshtml",
               "ViewState": "AQIAAJoDAAAAAAAAAAApwKcDAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2024-10-31T09:05:59.376Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-31T09:05:59.376Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 4,
               "Title": "Detail.cshtml",
-              "DocumentMoniker": "D:\\2022\\Project\\MeExpert\\MeExpert\\Views\\Candidate\\Detail.cshtml",
+              "DocumentMoniker": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Views\\Candidate\\Detail.cshtml",
               "RelativeDocumentMoniker": "MeExpert\\Views\\Candidate\\Detail.cshtml",
-              "ToolTip": "D:\\2022\\Project\\MeExpert\\MeExpert\\Views\\Candidate\\Detail.cshtml",
+              "ToolTip": "D:\\2025\\Project\\AWSMSPRO\\MeExpert\\Views\\Candidate\\Detail.cshtml",
               "RelativeToolTip": "MeExpert\\Views\\Candidate\\Detail.cshtml",
               "ViewState": "AQIAANABAAAAAAAAAAApwOQBAABCAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2023-01-11T04:08:13.891Z",
-              "EditorCaption": ""
+              "WhenOpened": "2023-01-11T04:08:13.891Z"
             }
           ]
         }
